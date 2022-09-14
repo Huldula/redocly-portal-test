@@ -10,7 +10,6 @@ training:
   - group: Petstore reference
     expanded: false
     pages:
-      - page: openapi/reference.page.yaml/*
       - page: openapi/reference-sfs.page.yaml/*
 
 alternative:
