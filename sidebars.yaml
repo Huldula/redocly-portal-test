@@ -1,16 +1,15 @@
 training:
   - page: developer-portal/index.md
-  - group: Training exercises
-    expanded: true
-    pages:
-      - label: Setup
-        page: developer-portal/setup.md
-      - label: Markdown
-        page: developer-portal/markdown.md
-  - group: Petstore reference
+
+  - group: Self Service
     expanded: false
     pages:
       - page: openapi/reference-sfs.page.yaml/*
+
+  - group: Admin bff
+    expanded: false
+    pages:
+      - page: openapi/reference-admin.page.yaml/*
 
 alternative:
   - page: developer-portal/sidebar-alternative.md

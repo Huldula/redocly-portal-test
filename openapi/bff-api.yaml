@@ -1,0 +1,4525 @@
+
+openapi: "3.0.2"
+info:
+  title: Veroo Organization Management BFF API
+  version: "0.1"
+  description:
+    $ref: ./some.md
+servers:
+  - url: https://admin-bff.org.veroo.io/v1
+  - url: https://party-service.org.veroo.io/admin-bff/v1
+paths:
+  /organizations:
+    description: >
+      This resource represents the collection of organizations interacting with the Veroo
+      platform.
+    get:
+      parameters:
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: name
+          required: false
+          description: The name of the organizations to return.
+          schema:
+            type: string
+        - in: query
+          name: display_name
+          required: false
+          description: The display name of the organizations to return.
+          schema:
+            type: string
+        - in: query
+          name: vat_id
+          required: false
+          description: The VAT identification number of the organizations to return.
+          schema:
+            type: string
+      tags:
+        - Organizations
+      summary: Get organizations
+      operationId: getOrganizations
+      description:
+        $ref: ./some.md
+      security:
+        - OAuth2: ["read:organizations"]
+      responses:
+        200:
+          description: Successfully loaded organization
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                  - paging
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/readOrganization"
+                  paging:
+                    $ref: "#/components/schemas/pageMetadata"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /organizations/search:
+    description: >
+      This resource represents sorted and filtered organizations interacting with the Veroo
+      platform.
+    post:
+      parameters:
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+      tags:
+        - Organizations
+      summary: Get sorted and filtered organizations
+      operationId: getOrganizationsSortedAndFiltered
+      description: >
+        [GET with body payload](https://opensource.zalando.com/restful-api-guidelines/#get-with-body) - no resources created:
+        Returns filtered and sorted Organizations.
+      security:
+        - OAuth2: ["read:organizations"]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/organizationSearchRequest"
+      responses:
+        200:
+          description: Successfully loaded organization
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                  - paging
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/readOrganization"
+                  paging:
+                    $ref: "#/components/schemas/pageMetadata"
+        400:
+          description: sorting/filtering option not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        501:
+          description: not implemented
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /organizations/{id}:
+    description: >
+      This resource represents a single organization. Each organization is identified by
+      an alphanumeric `id`.
+    get:
+      tags:
+        - Organizations
+      summary: Get organization by id
+      operationId: getOrganization
+      description: >
+        Load organization details for a given `id`.
+      security:
+        - OAuth2: ["read:organizations"]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the organization
+          schema:
+            type: string
+            format: uuid
+          example: 9b68f6dd-a6c4-4662-90fd-f3750dc7c606
+      responses:
+        200:
+          description: Successfully loaded organization
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/readOrganization"
+        400:
+          description: invalid request
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+
+  /organizations/{id}/connections/search:
+    description: >
+      This resource represents sorted and filtered connections of the organization specified by the id.
+    post:
+      parameters:
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+        - in: path
+          name: id
+          required: true
+          description: The id of the organization
+          schema:
+            type: string
+            format: uuid
+          example: 9b68f6dd-a6c4-4662-90fd-f3750dc7c606
+      tags:
+        - Organizations
+      summary: Get sorted and filtered connections of organization
+      operationId: getConnectionsOfOrganizationSortedAndFiltered
+      description: >
+        [GET with body payload](https://opensource.zalando.com/restful-api-guidelines/#get-with-body) - no resources created:
+        Returns filtered and sorted Connections of an Organization.
+      security:
+        - OAuth2: ["read:organizations"]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/connectionSortFilterRequest"
+      responses:
+        200:
+          description: Successfully loaded connections
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                  - paging
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/readConnection"
+                  paging:
+                    $ref: "#/components/schemas/pageMetadata"
+        400:
+          description: sorting/filtering option not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: organization not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        501:
+          description: not implemented
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+
+  /organizations/{id}/business-interactions/search:
+    description: >
+      This resource represents sorted and filtered business interactions of the organization specified by the id.
+    post:
+      parameters:
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+        - in: path
+          name: id
+          required: true
+          description: The id of the organization
+          schema:
+            type: string
+            format: uuid
+          example: 9b68f6dd-a6c4-4662-90fd-f3750dc7c606
+      tags:
+        - Organizations
+      summary: Get sorted and filtered business interactions of organization
+      operationId: getBusinessInteractionsOfOrganizationSortedAndFiltered
+      description: >
+        [GET with body payload](https://opensource.zalando.com/restful-api-guidelines/#get-with-body) - no resources created:
+        Returns filtered and sorted Business Interactions of an Organization.
+      security:
+        - OAuth2: ["read:organizations"]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/businessInteractionSortFilterRequest"
+      responses:
+        200:
+          description: Successfully loaded business interactions
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                  - paging
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/readBusinessInteraction"
+                  paging:
+                    $ref: "#/components/schemas/pageMetadata"
+        400:
+          description: sorting/filtering option not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: organization not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        501:
+          description: not implemented
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /applications:
+    description: >
+      This resource client applications of an organization.
+    get:
+      parameters:
+        - in: query
+          name: party_id
+          required: true
+          description: The id of the organization
+          schema:
+            type: string
+            format: uuid
+          example: 9b68f6dd-a6c4-4662-90fd-f3750dc7c606
+      tags:
+        - Client Applications
+      summary: Get client applications of organization
+      operationId: getClientApplications
+      description: Returns client applications of an organization from CAM.
+      security:
+        - OAuth2: ["read:applications"]
+      responses:
+        200:
+          description: Successfully got client applications
+          content:
+            "application/json":
+              schema:
+                type: object
+        400:
+          description: id is not a valid uuid format
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: organization not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+    post:
+      parameters:
+        - in: query
+          name: party_id
+          required: true
+          description: The id of the organization
+          schema:
+            type: string
+            format: uuid
+          example: 9b68f6dd-a6c4-4662-90fd-f3750dc7c606
+      tags:
+        - Client Applications
+      summary: Create client application for organization
+      operationId: createClientApplication
+      description: Creates client application for an organization from CAM.
+      security:
+        - OAuth2: ["write:applications"]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/createApplicationRequest"
+      responses:
+        201:
+          description: Successfully created client application
+          content:
+            "application/json":
+              schema:
+                type: object
+        400:
+          description: id is not a valid uuid format
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: organization not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /applications/{appId}:
+    description: >
+      This resource client applications of an organization.
+    delete:
+      parameters:
+        - in: path
+          name: appId
+          required: true
+          description: The id of the application
+          schema:
+            type: string
+            format: uuid
+          example: 9b68f6dd-a6c4-4662-90fd-f3750dc7c606
+      tags:
+        - Client Applications
+      summary: Delete client application
+      operationId: deleteClientApplication
+      description: Delete client application from CAM.
+      security:
+        - OAuth2: ["write:applications"]
+      responses:
+        204:
+          description: Successfully deleted client application
+          content:
+            "application/json":
+              schema:
+                type: object
+        400:
+          description: id is not a valid uuid format
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: organization not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /applications/{appId}/rotate-secret:
+    description: >
+      This resource client applications of an organization.
+    post:
+      parameters:
+        - in: path
+          name: appId
+          required: true
+          description: The id of the application
+          schema:
+            type: string
+            format: uuid
+          example: 9b68f6dd-a6c4-4662-90fd-f3750dc7c606
+      tags:
+        - Client Applications
+      summary: Rotate client secret for client application
+      operationId: rotateClientApplicationSecret
+      description: Rotate client secret of client application from CAM.
+      security:
+        - OAuth2: ["write:applications"]
+      responses:
+        200:
+          description: Successfully rotated client secret
+          content:
+            "application/json":
+              schema:
+                type: object
+        400:
+          description: id is not a valid uuid format
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: organization not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /applications/{appId}/block:
+    description: >
+      This resource client applications of an organization.
+    post:
+      parameters:
+        - in: path
+          name: appId
+          required: true
+          description: The id of the application
+          schema:
+            type: string
+            format: uuid
+          example: 9b68f6dd-a6c4-4662-90fd-f3750dc7c606
+      tags:
+        - Client Applications
+      summary: Block client application
+      operationId: blockClientApplication
+      description: Block client application from CAM.
+      security:
+        - OAuth2: ["write:applications"]
+      responses:
+        200:
+          description: Successfully blocked client application
+          content:
+            "application/json":
+              schema:
+                type: object
+        400:
+          description: id is not a valid uuid format
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: organization not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /applications/{appId}/activate:
+    description: >
+      This resource client applications of an organization.
+    post:
+      parameters:
+        - in: path
+          name: appId
+          required: true
+          description: The id of the application
+          schema:
+            type: string
+            format: uuid
+          example: 9b68f6dd-a6c4-4662-90fd-f3750dc7c606
+      tags:
+        - Client Applications
+      summary: Activate client application
+      operationId: activateClientApplication
+      description: Activate client application from CAM.
+      security:
+        - OAuth2: ["write:applications"]
+      responses:
+        200:
+          description: Successfully activated client application
+          content:
+            "application/json":
+              schema:
+                type: object
+        400:
+          description: id is not a valid uuid format
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: organization not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+
+  /users:
+    description: >
+      This resource represents the collection of users interacting with the Veroo
+      platform.
+    get:
+      tags:
+        - Users
+      summary: Get users
+      operationId: getUsers
+      description: >
+        Get all users
+      security:
+        - OAuth2: ["read:users"]
+      parameters:
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: email
+          required: false
+          description: The email of the user to return.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully loaded users
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                  - paging
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/user"
+                  paging:
+                    $ref: "#/components/schemas/pageMetadata"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /users/search:
+    description: >
+      This resource represents sorted and filtered users interacting with the Veroo
+      platform.
+    post:
+      parameters:
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+      tags:
+        - Users
+      summary: Get sorted and filtered users
+      operationId: getUsersSortedAndFiltered
+      description: >
+        [GET with body payload](https://opensource.zalando.com/restful-api-guidelines/#get-with-body) - no resources created:
+        Returns filtered and sorted Users.
+      security:
+        - OAuth2: ["read:users"]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/userSearchRequest"
+      responses:
+        200:
+          description: Successfully loaded users
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                  - paging
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/user"
+                  paging:
+                    $ref: "#/components/schemas/pageMetadata"
+        400:
+          description: sorting/filtering option not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        501:
+          description: not implemented
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /users/{id}:
+    description: >
+      This resource represents a single user. Each user is identified by
+      an alphanumeric `id`.
+    get:
+      tags:
+        - Users
+      summary: Get user by id
+      operationId: getUser
+      description: >
+        Load user details for a given `id`.
+      security:
+        - OAuth2: ["read:users"]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the user
+          schema:
+            type: string
+          example: email|5f36843ed950a870a431990d
+      responses:
+        200:
+          description: Successfully loaded user
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/user"
+        404:
+          description: user not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customers:
+    description: >
+      This resource represents the collection of customers interacting with the Veroo
+      platform.
+    post:
+      tags:
+        - Customers
+      summary: Create customer
+      operationId: createCustomer
+      description: >
+        Creates a customer for a given party id.
+      security:
+        - OAuth2: ["write:organizations"]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/customer"
+      responses:
+        201:
+          description: customer created for party
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customer"
+        400:
+          description: Invalid customer
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        401:
+          description: The caller is not authenticated (i.e the JWT token is missing)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        403:
+          description: Forbidden. The caller is not authorized
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: A customer already exists for the given party
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customers/{id}/users:
+    description: >
+      This resource represents all users of a customers.
+    get:
+      tags:
+        - Customers
+      summary: Get user by customer
+      operationId: getUsersByCustomer
+      description: >
+        Load users for a customer.
+      security:
+        - OAuth2: ["read:organizations", "read:users"]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the customer
+          schema:
+            type: string
+            format: uuid
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: email
+          required: false
+          description: The email of the user to return.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully loaded users
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                  - paging
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/user"
+                  paging:
+                    $ref: "#/components/schemas/pageMetadata"
+        404:
+          description: customer not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customers/{id}/user-invitations:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: The id of the customer
+        schema:
+          type: string
+          format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    description: >
+      Create an invitation for a new user to join this customer.
+    post:
+      tags:
+        - Customers
+      summary: Create user invitation for customer
+      operationId: createUserInvitationForCustomer
+      description: >
+        Creates a user invitation for the given customer.
+      security:
+        - OAuth2: ["write:organizations", "write:users"]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/userInvitation"
+      responses:
+        201:
+          description: user invitation created for customer
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/userInvitation"
+        400:
+          description: Invalid customer
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        401:
+          description: The caller is not authenticated (i.e the JWT token is missing)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        403:
+          description: Forbidden. The caller is not authorized
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: A customer already exists for the given party
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+    get:
+      tags:
+        - Customers
+      summary: Get user invitations for a customer
+      operationId: getUserInvitationsForCustomer
+      description: >
+        This resource represents the user invitations of a given customer.
+      security:
+        - OAuth2: ["read:organizations"]
+      parameters:
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: email
+          required: false
+          description: The email of the user invitation to return.
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successfully loaded user invitations of customer
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                  - paging
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/userInvitation"
+                  paging:
+                    $ref: "#/components/schemas/pageMetadata"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: customer not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customers/{id}/user-invitations/{invitationId}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: The id of the customer
+        schema:
+          type: string
+          format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+      - in: path
+        name: invitationId
+        required: true
+        description: The id of the invitation
+        schema:
+          type: string
+          format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    get:
+      tags:
+        - Customers
+      summary: Get user invitation by id for a customer
+      operationId: getUserInvitationForCustomer
+      description: >
+        This resource represents the user invitation of a given customer.
+      security:
+        - OAuth2: ["read:organizations"]
+      responses:
+        200:
+          description: Successfully loaded user invitation of customer
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/userInvitation"
+        404:
+          description: invitation not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+    put:
+      deprecated: true
+      tags:
+        - Customers
+      summary: Update and resend user invitation for customer
+      operationId: updateUserInvitationForCustomer
+      description: >
+        Updates and resends a user invitation for the given customer. For now, only the validityPeriod can be changed. Updating the other fields is not allowed yet and will result in an error.
+      security:
+        - OAuth2: ["write:organizations", "write:users"]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/userInvitation"
+      responses:
+        200:
+          description: user invitation updated for customer
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/userInvitation"
+        400:
+          description: Invalid customer
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        401:
+          description: The caller is not authenticated (i.e the JWT token is missing)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        403:
+          description: Forbidden. The caller is not authorized
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: User Invitation is already accepted.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customers/{id}/user-invitations/{invitationId}/resend:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: The id of the customer
+        schema:
+          type: string
+          format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+      - in: path
+        name: invitationId
+        required: true
+        description: The id of the invitation
+        schema:
+          type: string
+          format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    description: This resource represents Customer User Invitations.
+    post:
+      tags:
+        - Customers
+      summary: Resend user invitation for customer
+      operationId: resendUserInvitation
+      description: >
+        Resends a user invitation for the given customer.
+      security:
+        - OAuth2: ["write:organizations", "write:users"]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                validityPeriod:
+                  type: string
+                  description: >
+                    The period (duration) the customer user invitation should be valid.
+                    Formatted as an ISO 8601 duration.
+                  default: P7D
+                  example: P7D
+                  writeOnly: true
+      responses:
+        200:
+          description: The customer user invitation was successfully resent.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/userInvitation"
+        400:
+          description: Validation failed (uuid v4 is expected)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer User Invitation not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: User Invitation is already accepted or withdrawn.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customers/{id}/user-invitations/{invitationId}/withdraw:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: The id of the customer
+        schema:
+          type: string
+          format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+      - in: path
+        name: invitationId
+        required: true
+        description: The id of the invitation
+        schema:
+          type: string
+          format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    description: This resource represents Customer User Invitations.
+    post:
+      tags:
+        - Customers
+      summary: Withdraw user invitation for customer
+      operationId: withdrawUserInvitation
+      description: >
+        Withdraws a user invitation for the given customer.
+      security:
+        - OAuth2: ["write:organizations", "write:users"]
+      responses:
+        200:
+          description: The customer user invitation was successfully withdrawn.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/userInvitation"
+        400:
+          description: Validation failed (uuid v4 is expected)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer User Invitation not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: User Invitation is already accepted or withdrawn.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customers/{id}/additional-user-identification:
+    get:
+      tags:
+        - Customers
+      summary: Identify additional users to add to a customer
+      operationId: identifyAdditionalUsersForCustomer
+      description: |
+        Identify possible users to add to a customer by
+        - searching for existing users based on an email or name sub-string matching and evaluating their state and also
+        - evaluating whether the searched user can be added or invited to the customer
+        - if a user matches the searchterm exactly, he will be on the start of the list
+      security:
+        - OAuth2: [ "read:organizations", "read:users" ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the customer
+          schema:
+            type: string
+            format: uuid
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        - in: query
+          name: q
+          required: true
+          description: |
+            The free text search string for users.
+            The following fields are taken into consideration for the search:
+            - email
+            - firstName
+            - lastName
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 512
+          example: Martin
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+      responses:
+        200:
+          description: Successfully loaded additional user identification for a customer
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerAdditionalUserIdentification"
+        400:
+          description: bad request - param validation failed
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: customer not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /carriers:
+    description: >
+      This resource represents the collection of carriers interacting with the Veroo
+      platform.
+    post:
+      tags:
+        - Carriers
+      summary: Create carrier
+      operationId: createCarrier
+      description: >
+        Creates a carrier for a given party id.
+      security:
+        - OAuth2: ["write:organizations"]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/carrier"
+      responses:
+        201:
+          description: carrier created for party
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/carrier"
+        400:
+          description: Invalid carrier
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        401:
+          description: The caller is not authenticated (i.e the JWT token is missing)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        403:
+          description: Forbidden. The caller is not authorized
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: A carrier already exists for the given party
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /shippers:
+    description: >
+      This resource represents the collection of shippers interacting with the Veroo
+      platform.
+    post:
+      tags:
+        - Shippers
+      summary: Create shipper
+      operationId: createShipper
+      description: >
+        Creates a shipper for a given party id.
+      security:
+        - OAuth2: ["write:organizations"]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/shipper"
+      responses:
+        201:
+          description: shipper created for party
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/shipper"
+        400:
+          description: Invalid shipper
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        401:
+          description: The caller is not authenticated (i.e the JWT token is missing)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        403:
+          description: Forbidden. The caller is not authorized
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: A shipper already exists for the given party
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customers/{id}/users/{userId}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: The id of the customer
+        schema:
+          type: string
+          format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+      - in: path
+        name: userId
+        required: true
+        description: The id of the user
+        schema:
+          type: string
+          format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    put:
+      tags:
+        - Customers
+      summary: Associate customer and user
+      operationId: associateCustomerAndUser
+      description: >
+        Associates customer and user with roles
+      security:
+        - OAuth2: ["write:organizations"]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/customerUserAssociation"
+
+      responses:
+        200:
+          description: Association updated
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerUserAssociation"
+        201:
+          description: Association created
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerUserAssociation"
+        400:
+          description: Invalid customer
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: Identical Roles
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+    delete:
+      tags:
+        - Customers
+      summary: Delete customer-user association
+      operationId: deleteCustomerUserAssociation
+      description: >
+        Deletes Association between the customer and user
+      security:
+        - OAuth2: ["write:organizations"]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the customer
+          schema:
+            type: string
+            format: uuid
+          example: 9b68f6dd-a6c4-4662-90fd-f3750dc7c606
+        - in: path
+          name: userId
+          required: true
+          description: The id of the user
+          schema:
+            type: string
+          example: auth0|28357293506346
+      responses:
+        204:
+          description: Association deleted
+        400:
+          description: Invalid customer id
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer / User / not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: Customer and User might exist, but are not connected
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+
+  /customer-setup-vouchers:
+    post:
+      summary: Create a customer-setup-voucher
+      description: Create a customer-setup-voucher
+      operationId: postCustomerSetupVoucher
+      tags:
+        - Customer Setup Vouchers
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: '#/components/schemas/createCustomerSetupVoucher'
+      responses:
+        "201":
+          description: Successfully created customer setup voucher
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerSetupVoucher"
+        "400":
+          description: Validation failed
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        "401":
+          description: The caller is not authenticated (i.e the JWT token is missing)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        "403":
+          description: Forbidden. The caller is not authorized
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        "409":
+          description: The request could not be completed due to a conflict with the current state of the target resource.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        "500":
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        "501":
+          description: voucher type not implemented
+          content:
+            "application/json":
+              schema:
+                $ref: '#/components/schemas/problem'
+
+  /customer-setup-vouchers/{id}/logs:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: The id of the customer-setup-voucher
+        schema:
+          type: string
+          format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    description: This resource represents Customer Setup Voucher Logs.
+    get:
+      tags:
+        - Customer Setup Vouchers
+      summary: Get Customer Setup Voucher Logs
+      operationId: getCustomerSetupVoucherLogs
+      description: Get Customer Setup Voucher Logs by Customer Setup Voucher id
+      parameters:
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+      security:
+        - OAuth2: [ "read:customer-setup-vouchers" ]
+      responses:
+        200:
+          description: Successfully loaded Customer Setup Voucher Logs
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                  - paging
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/customerSetupVoucherLog"
+                  paging:
+                    $ref: "#/components/schemas/pageMetadata"
+        400:
+          description: Validation failed (uuid v4 is expected)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer Setup Voucher not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customer-setup-vouchers/{id}:
+    get:
+      tags:
+        - Customer Setup Vouchers
+      summary: Get Customer Setup Voucher by id
+      operationId: getCustomerSetupVoucherById
+      description: Get Customer Setup Voucher by id
+      security:
+        - OAuth2: [ "read:customer-setup-vouchers" ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the customer setup voucher
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successfully loaded customer setup voucher
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerSetupVoucher"
+        400:
+          description: Validation failed (uuid v4 is expected)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer Setup Voucher not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customer-setup-vouchers/{id}/withdraw:
+    post:
+      tags:
+        - Customer Setup Vouchers
+      summary: Withdraw Customer Setup Voucher
+      operationId: withdrawCustomerSetupVouchers
+      description: Withdraw Customer Setup Voucher
+      security:
+        - OAuth2: [ "write:customer-setup-vouchers" ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the customer setup voucher
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successfully withdrawn customer setup voucher
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerSetupVoucher"
+        400:
+          description: Validation failed (uuid v4 is expected)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer Setup Voucher not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: Conflict
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customer-setup-vouchers/{id}/reject:
+    post:
+      tags:
+        - Customer Setup Vouchers
+      summary: Reject Customer Setup Voucher
+      operationId: rejectCustomerSetupVouchers
+      description: Reject Customer Setup Voucher
+      security:
+        - OAuth2: [ "write:customer-setup-vouchers" ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the customer setup voucher
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              required:
+                - reason
+              properties:
+                reason:
+                  type: string
+                  description: >
+                    The reason why this voucher is being rejected.
+                  example: Violates company guidelines
+      responses:
+        "200":
+          description: Successfully rejected customer setup voucher
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerSetupVoucher"
+        400:
+          description: Validation failed (uuid v4 is expected)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer Setup Voucher not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: Conflict
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customer-setup-vouchers/{id}/extend:
+    post:
+      tags:
+        - Customer Setup Vouchers
+      summary: Extend Customer Setup Voucher
+      operationId: extendCustomerSetupVouchers
+      description: Extend the expiration date of a Customer Setup Voucher
+      security:
+        - OAuth2: [ "write:customer-setup-vouchers" ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the customer setup voucher
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                validityPeriod:
+                  type: string
+                  description: >
+                    The period (duration) the customer setup voucher should be extended.
+                    Formatted as an ISO 8601 duration.
+                  default: P7D
+                  example: P7D
+                  writeOnly: true
+      responses:
+        "200":
+          description: Successfully extended customer setup voucher
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerSetupVoucher"
+        400:
+          description: Validation failed (uuid v4 is expected)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer Setup Voucher not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: Conflict
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customer-setup-vouchers/{id}/resend:
+    post:
+      tags:
+        - Customer Setup Vouchers
+      summary: Resend Customer Setup Voucher
+      operationId: resendCustomerSetupVouchers
+      description: Resend Customer Setup Voucher (only possible for Customer Invitations)
+      security:
+        - OAuth2: [ "write:customer-setup-vouchers" ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the customer setup voucher
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                validityPeriod:
+                  type: string
+                  description: >
+                    The period (duration) the customer setup voucher's validity will be extended after the resend.
+                    Formatted as an ISO 8601 duration.
+                  default: P30D
+                  example: P30D
+                  writeOnly: true
+      responses:
+        "200":
+          description: Successfully resent customer setup voucher
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerSetupVoucher"
+        400:
+          description: Validation failed (uuid v4 is expected)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer Setup Voucher not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: Conflict
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customer-setup-vouchers/{id}/redeem:
+    post:
+      tags:
+        - Customer Setup Vouchers
+      summary: Redeem Customer Setup Voucher
+      operationId: redeemCustomerSetupVouchers
+      description: Manually redeem Customer Setup Voucher
+      security:
+        - OAuth2: [ "write:customer-setup-vouchers" ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the customer setup voucher
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successfully redeemed customer setup voucher
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerSetupVoucher"
+        400:
+          description: Validation failed (uuid v4 is expected)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer Setup Voucher not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: Conflict
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customer-setup-vouchers/{id}/reopen:
+    post:
+      tags:
+        - Customer Setup Vouchers
+      summary: Reopen Customer Setup Voucher
+      operationId: reopenCustomerSetupVouchers
+      description: Reopen Customer Setup Voucher
+      security:
+        - OAuth2: [ "write:customer-setup-vouchers" ]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the customer setup voucher
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                sendNotificationEmail:
+                  type: boolean
+                  description: >
+                    Indicates whether a notification email should be sent when reopening the Customer Setup Voucher.
+                  default: true
+                  example: true
+                  writeOnly: true
+      responses:
+        "200":
+          description: Successfully reopened customer setup voucher
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerSetupVoucher"
+        400:
+          description: Validation failed (uuid v4 is expected)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer Setup Voucher not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: Conflict
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customer-setup-vouchers/search:
+    description: This resource represents sorted and filtered Customer Setup Vouchers.
+    post:
+      tags:
+        - Customer Setup Vouchers
+      summary: Get sorted and filtered Customer Setup Vouchers
+      operationId: getCustomerSetupVouchersSortedFiltered
+      description: >
+        [GET with body payload](https://opensource.zalando.com/restful-api-guidelines/#get-with-body) - no resources created:
+        Returns filtered and sorted Customer Setup Vouchers.
+      security:
+        - OAuth2: [ "read:customer-setup-vouchers" ]
+      parameters:
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/customerSetupVoucherSearchRequest"
+      responses:
+        200:
+          description: Successfully loaded customer setup vouchers
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                  - paging
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/customerSetupVoucherSearchResponse"
+                  paging:
+                    $ref: "#/components/schemas/pageMetadata"
+        400:
+          description: sorting/filtering option not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+
+  /customer-setup-vouchers/{id}/identification-history:
+    description:
+      Identification history
+    get:
+      tags:
+        - Customer Setup Vouchers
+      summary: Identification history of a voucher
+      description: >
+        Get identification history of a voucher sorted by createdAt descending
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the voucher
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Successfully loaded the identification history of a voucher
+          content:
+            "application/json":
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/identificationHistory"
+        404:
+          description: customer-setup-voucher not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+
+  /customer-setup-vouchers/{id}/validate-vat-id:
+    description:
+      Manually validate the VAT-ID of a voucher
+    post:
+      tags:
+        - Customer Setup Vouchers
+      summary: Manually validate VAT-ID
+      description: >
+        Manually validate the VAT-ID of a voucher
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the voucher
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                updatedVatId:
+                  type: string
+                  example: ATU12345678
+                  minLength: 4
+                  maxLength: 64
+                  description: If no updatedVatId is provided in the body, the existing VAT-ID is reused
+                manualValidationNote:
+                  type: string
+                  example: text entered by admin
+                  minLength: 1
+                  maxLength: 5000
+                  description: An optional message that can be entered by an admin
+
+      responses:
+        201:
+          description: Succesfully started the validation of the VAT-ID
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum:
+                      - VALID
+                      - INVALID
+                      - VALIDATION_NEEDED
+                      - VALIDATION_NOT_NEEDED
+                      - VAT_VALIDATION_PENDING
+                      - VAT_VALIDATION_FAILED
+                    example: VAT_VALIDATION_PENDING
+        400:
+          description: invalid request
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: customer-setup-voucher not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: Conflict
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+
+  /search:
+    description: >
+      This resource is used to search for organizations, users and customer setup vouchers in the Veroo Platform.
+    get:
+      tags:
+        - Search
+      summary: Global Search
+      operationId: search
+      description: >
+        Search Organizations, Users and Customer Setup Vouchers
+      security:
+        - OAuth2:
+            ["read:organizations", "read:users", "read:customer-setup-vouchers"]
+      parameters:
+        - in: query
+          name: q
+          required: true
+          description: |
+            The search sub-string used to find organizations, users and customer setup vouchers.
+            Currently, the following fields are taken into consideration when searching:
+            - organization.id (exact match)
+            - organization.vatId
+            - organization.displayName
+            - organization.name
+            - customer.id (exact match)
+            - shipper.id (exact match)
+            - carrier.id (exact match)
+            - user.id
+            - user.email
+            - user.firstName
+            - user.lastName
+            - customerSetupVoucher.id (exact match)
+            - customerSetupVoucher.externalId (exact match)
+          schema:
+            type: string
+            minLength: 3
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 10
+      responses:
+        200:
+          description: Successfully loaded matching organizations, users and customer setup vouchers
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                properties:
+                  items:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: "#/components/schemas/userSearchResult"
+                        - $ref: "#/components/schemas/organizationSearchResult"
+                        - $ref: "#/components/schemas/customerSetupVoucherSearchResult"
+                      discriminator:
+                        propertyName: type
+                        mapping:
+                          user: "#/components/schemas/userSearchResult"
+                          organization: "#/components/schemas/organizationSearchResult"
+                          customerSetupVoucher: "#/components/schemas/customerSetupVoucherSearchResult"
+        400:
+          description: invalid request
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+
+  /customer-setup-inquiries:
+    description: This resource represents a customer-setup-inquiry.
+    get:
+      tags:
+        - Customer Setup Inquiries
+      operationId: getCustomerSetupInquiry
+      summary: Get customer setup inquiry by voucher id
+      description: Get a customer setup inquiry for a customer setup voucher
+      parameters:
+        - in: query
+          name: voucher_id
+          required: true
+          description: |
+            The id of the customer setup voucher
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Successfully loaded the customer setup inquiry for voucher.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerSetupInquiry"
+        400:
+          description: bad request
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: customer-setup-inquiry not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+
+components:
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://login-stage.veroo.io/authorize
+          tokenUrl: https://login-stage.veroo.io/oauth/token
+          scopes:
+            read:organizations: Grants access to read organizations
+            write:organizations: Grants access to write and edit organizations
+            read:users: Grants access to read users
+            write:users: Grants access to write and edit users
+            read:customer-setup-vouchers: Grants access to read customer setup vouchers
+            write:customer-setup-vouchers: Grants access to write and edit customer setup vouchers
+            read:applications: Grants access to read client applications
+            write:applications: Grants access to write and edit client applications
+
+  schemas:
+    organization:
+      type: object
+      required:
+        - name
+        - id
+        - address
+        - vatId
+      allOf:
+        - $ref: "#/components/schemas/readOrganization"
+
+    readOrganization:
+      type: object
+      description: The "read organization" schema is currently needed since some legacy organizations do not contain an address or vatId.
+      required:
+        - name
+        - id
+        - identification
+      properties:
+        id:
+          type: string
+          description: The id of the party.
+          format: uuid
+          maxLength: 36
+          readOnly: true
+        name:
+          type: string
+          description: The name of the organization.
+          maxLength: 512
+          minLength: 3
+          example: Test Organization
+        displayName:
+          type: string
+          description: The display name of the organization.
+          maxLength: 512
+          minLength: 3
+          example: Test Org
+        identification:
+          type: object
+          description: The organization identification
+          allOf:
+            - $ref: "#/components/schemas/organizationIdentification"
+        address:
+          $ref: "#/components/schemas/address"
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the organization.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        modifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of the last time the organization got modified.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        customer:
+          readOnly: true
+          allOf:
+            - $ref: "#/components/schemas/customerAttributes"
+        carrier:
+          readOnly: true
+          allOf:
+            - $ref: "#/components/schemas/carrierAttributes"
+        shipper:
+          readOnly: true
+          allOf:
+            - $ref: "#/components/schemas/shipperAttributes"
+
+    readConnection:
+      type: object
+      description: The connection between two organizations.
+      required:
+        - id
+        - direction
+        - partner
+      properties:
+        id:
+          type: string
+          description: The id of the connection.
+          format: uuid
+          maxLength: 36
+          readOnly: true
+        direction:
+          type: string
+          enum:
+            - INCOMING
+            - OUTGOING
+            - BIDIRECTIONAL
+          description: The direction of the connection, seen from the perspective of the requested organizaton.
+        partner:
+          type: object
+          description: The partner of the connection, seen from the perspective of the requested organizaton.
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: string
+              description: The id of the partner organization.
+              format: uuid
+              maxLength: 36
+              readOnly: true
+            name:
+              type: string
+              description: The name of the partner organization.
+              maxLength: 512
+              minLength: 3
+              example: Test Organization
+            reference:
+              type: string
+              description: The string used to reference the partner.
+              minLength: 3
+
+    readBusinessInteraction:
+      type: object
+      description: The business interaction of an organization.
+      required:
+        - participatingParty
+        - originDomain
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: The id of the business interaction.
+          nullable: true
+          format: uuid
+          maxLength: 36
+          readOnly: true
+        participatingParty:
+          type: object
+          description: The other participating party of the business interaction, seen from the perspective of the requested organizaton.
+          required:
+            - id
+            - name
+          properties:
+            id:
+              type: string
+              description: The id of the participating organization.
+              format: uuid
+              maxLength: 36
+              readOnly: true
+            name:
+              type: string
+              description: The name of the participating organization.
+              maxLength: 512
+              minLength: 3
+              example: Test Organization
+            role:
+              type: string
+              nullable: true
+              description: The role of the participating organization in this business interaction.
+              enum:
+                - SHIPPER
+                - CARRIER
+                - null
+        partnerReference:
+          type: string
+          nullable: true
+          description: The partner reference used in this business interaction for the participatingParty
+        type:
+          type: string
+          nullable: true
+          description: The type of the business interaction
+        originDomain:
+          type: string
+          description: The domain from which the business interaction originates
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the business interaction.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+
+
+
+    address:
+      type: object
+      required:
+        - countryCode
+        - city
+      description: A postal address
+      properties:
+        countryCode:
+          type: string
+          description: ISO 3166-1 country code
+          maxLength: 2
+          example: AT
+        city:
+          type: string
+          description: The name of the city
+          maxLength: 255
+          example: Graz
+        state:
+          type: string
+          description: The name of the state
+          maxLength: 255
+          example: Styria
+        postalCode:
+          type: string
+          description: The postal code
+          maxLength: 16
+          example: 8010
+        province:
+          type: string
+          description: The name of the province
+          maxLength: 64
+          example: Graz
+        district:
+          type: string
+          description: The name of the district
+          maxLength: 64
+          example: 1. Bezirk-Innere Stadt
+        subdistrict:
+          type: string
+          description: The name of the subdistrict
+          maxLength: 64
+          example: Kirchenviertel
+        street:
+          type: string
+          description: The name of the street
+          maxLength: 64
+          example: Abraham-A-Sancta-Clara-Gasse
+        houseNumber:
+          type: string
+          description: The house number
+          maxLength: 64
+          example: 2
+        additionalInformation:
+          type: string
+          description: Additional information to the address (Suite/Unit/etc)
+          maxLength: 255
+          example: Suite 197A
+
+    organizations:
+      type: object
+      required:
+        - organization
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/readOrganization"
+
+    organizationSearchRequest:
+      type: object
+      properties:
+        sort:
+          type: array
+          items:
+            type: object
+            required:
+              - field
+              - order
+            properties:
+              field:
+                type: string
+                enum:
+                  - NAME
+                  - ADDRESS
+                  - CREATED_AT
+                  - ROLES
+              order:
+                type: string
+                enum:
+                  - ASC
+                  - DESC
+        filter:
+          type: array
+          items:
+            type: object
+            required:
+              - field
+              - value
+              - matchMode
+            properties:
+              field:
+                type: string
+                enum:
+                  - NAME
+                  - ADDRESS
+                  - CREATED_AT
+                  - VAT_ID
+                  - ROLES
+              value:
+                oneOf:
+                  - type: string
+                  - type: array
+                    items:
+                      type: string
+              matchMode:
+                type: string
+                enum:
+                  - CONTAINS
+                  - BEFORE
+                  - AFTER
+                  - EQUALS
+
+    connectionSortFilterRequest:
+      type: object
+      properties:
+        sort:
+          type: array
+          items:
+            type: object
+            required:
+              - field
+              - order
+            properties:
+              field:
+                type: string
+                enum:
+                  - DIRECTION
+                  - PARTNER
+                  - PARTNER_REFERENCE
+              order:
+                type: string
+                enum:
+                  - ASC
+                  - DESC
+        filter:
+          type: array
+          items:
+            type: object
+            required:
+              - field
+              - value
+              - matchMode
+            properties:
+              field:
+                type: string
+                enum:
+                  - DIRECTION
+                  - PARTNER
+                  - PARTNER_REFERENCE
+              value:
+                oneOf:
+                  - type: string
+                  - type: array
+                    items:
+                      type: string
+              matchMode:
+                type: string
+                enum:
+                  - CONTAINS
+                  - EQUALS
+
+    businessInteractionSortFilterRequest:
+      type: object
+      properties:
+        sort:
+          type: array
+          items:
+            type: object
+            required:
+              - field
+              - order
+            properties:
+              field:
+                type: string
+                enum:
+                  - PARTNER_NAME
+                  - PARTNER_ROLE
+                  - PARTNER_REFERENCE
+              order:
+                type: string
+                enum:
+                  - ASC
+                  - DESC
+        filter:
+          type: array
+          items:
+            type: object
+            required:
+              - field
+              - value
+              - matchMode
+            properties:
+              field:
+                type: string
+                enum:
+                  - PARTNER_NAME
+                  - PARTNER_ROLE
+                  - PARTNER_REFERENCE
+              value:
+                oneOf:
+                  - type: string
+                  - type: array
+                    items:
+                      type: string
+              matchMode:
+                type: string
+                enum:
+                  - CONTAINS
+                  - EQUALS
+
+    createApplicationRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: name of the application
+        authenticationMethod:
+          type: string
+          enum:
+            - CLIENT_CREDENTIALS
+            - API_KEY
+
+    userSearchRequest:
+      type: object
+      properties:
+        sort:
+          type: array
+          items:
+            type: object
+            required:
+              - field
+              - order
+            properties:
+              field:
+                type: string
+                enum:
+                  - EMAIL
+                  - FIRSTNAME
+                  - LASTNAME
+                  - ORGANIZATION
+                  - CREATED_AT
+              order:
+                type: string
+                enum:
+                  - ASC
+                  - DESC
+        filter:
+          type: array
+          items:
+            type: object
+            required:
+              - field
+              - value
+              - matchMode
+            properties:
+              field:
+                type: string
+                enum:
+                  - EMAIL
+                  - FIRSTNAME
+                  - LASTNAME
+                  - ORGANIZATION
+                  - CREATED_AT
+              value:
+                oneOf:
+                  - type: string
+                  - type: array
+                    items:
+                      type: string
+              matchMode:
+                type: string
+                enum:
+                  - CONTAINS
+                  - BEFORE
+                  - AFTER
+                  - EQUALS
+
+    user:
+      type: object
+      required:
+        - id
+        - partyId
+        - email
+        - createdAt
+        - modifiedAt
+      properties:
+        id:
+          type: string
+          description: The id of the user as provided by the identity provider.
+          maxLength: 64
+          readOnly: true
+          example: email|5f36843ed950a870a431990d
+        partyId:
+          type: string
+          description: The id of the individual.
+          format: uuid
+          maxLength: 36
+          readOnly: true
+        email:
+          type: string
+          description: The email of the user.
+          format: email
+          example: user@example.com
+        firstName:
+          type: string
+          description: The first name of the user.
+          maxLength: 512
+          example: Max
+        lastName:
+          type: string
+          description: The last name of the user.
+          maxLength: 512
+          example: Huber
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the organization.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        modifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of the last time the organization got modified.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        partyAssociation:
+          $ref: "#/components/schemas/partyAssociation"
+
+    partyAssociation:
+      type: object
+      description: An association between a user and another party
+      # use oneOf once more than one subschema is inserted
+      allOf:
+        - $ref: "#/components/schemas/customerAssociation"
+      discriminator:
+        propertyName: type
+        mapping:
+          customer: "#/components/schemas/customerAssociation"
+
+    customerAssociation:
+      type: object
+      description: An association between a user and a customer
+      required:
+        - type
+        - customerId
+        - roles
+        - organization
+        - createdAt
+      properties:
+        type:
+          type: string
+          description: The type of party association
+          maxLength: 128
+          example: "customer"
+        customerId:
+          type: string
+          description: The ID of the associated customer
+          format: uuid
+        roles:
+          type: array
+          items:
+            type: string
+            example: business-admin
+          description: The roles the user has in the customer organization
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the organization.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        organization:
+          $ref: "#/components/schemas/associatedOrganization"
+
+    associatedOrganization:
+      type: object
+      description: Information about an associated organization
+      required:
+        - name
+        - id
+      properties:
+        id:
+          type: string
+          description: The id of the organization.
+          format: uuid
+          maxLength: 36
+        name:
+          type: string
+          description: The name of the organization.
+          maxLength: 512
+          minLength: 3
+          example: Test Organization
+        displayName:
+          type: string
+          description: The display name of the organization.
+          maxLength: 512
+          minLength: 3
+          example: Test Org
+
+    customerAttributes:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: The id of the customer.
+          format: uuid
+          maxLength: 64
+          readOnly: true
+          example: b76e0899-a826-4779-a61a-14b62c77e61f
+
+    customer:
+      required:
+        - partyId
+      allOf:
+        - type: object
+          properties:
+            partyId:
+              type: string
+              description: The id of the party.
+              format: uuid
+              maxLength: 64
+        - $ref: "#/components/schemas/customerAttributes"
+
+    carrierAttributes:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: The id of the carrier.
+          format: uuid
+          maxLength: 64
+          readOnly: true
+          example: b76e0899-a826-4779-a61a-14b62c77e61f
+
+    carrier:
+      required:
+        - partyId
+      allOf:
+        - type: object
+          properties:
+            partyId:
+              type: string
+              description: The id of the party.
+              format: uuid
+              maxLength: 64
+        - $ref: "#/components/schemas/carrierAttributes"
+
+    shipperAttributes:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: The id of the shipper.
+          format: uuid
+          maxLength: 64
+          readOnly: true
+          example: b76e0899-a826-4779-a61a-14b62c77e61f
+
+    shipper:
+      required:
+        - partyId
+      allOf:
+        - type: object
+          properties:
+            partyId:
+              type: string
+              description: The id of the party.
+              format: uuid
+              maxLength: 64
+        - $ref: "#/components/schemas/shipperAttributes"
+
+    customerUserAssociation:
+      type: object
+      properties:
+        roles:
+          type: array
+          items:
+            type: string
+            example: business-admin
+
+    pageMetadata:
+      type: object
+      properties:
+        limit:
+          type: integer
+          description: >
+            The maximum number of elements that are returned. (i.e. the page size)
+          minimum: 1
+          maximum: 100
+          example: 10
+        totalCount:
+          type: integer
+          description: >
+            The total number of elements in the collection.
+          minimum: 0
+          example: 50
+        offset:
+          type: integer
+          description: >
+            The offset used in the result.
+          minimum: 0
+          example: 10
+
+
+    userSearchResult:
+      type: object
+      properties:
+        type:
+          type: string
+          example: 'user'
+          enum:
+            - user
+        user:
+          type: object
+          properties:
+            id:
+              type: string
+              description: The id of the user.
+              maxLength: 64
+              readOnly: true
+              example: email|5f36843ed950a870a431990d
+            email:
+              type: string
+              description: The email of the user.
+              format: email
+              example: user@example.com
+            firstName:
+              type: string
+              description: The first name of the user.
+              maxLength: 512
+              example: Max
+            lastName:
+              type: string
+              description: The last name of the user.
+              maxLength: 512
+              example: Huber
+
+    organizationSearchResult:
+      type: object
+      properties:
+        type:
+          type: string
+          example: 'organization'
+          enum:
+            - organization
+        organization:
+          type: object
+          properties:
+            id:
+              type: string
+              description: The id of the organization.
+              maxLength: 64
+              readOnly: true
+              example: b76e0899-a826-4779-a61a-14b62c77e61f
+            name:
+              type: string
+              description: The name of the organization.
+              maxLength: 512
+              minLength: 3
+              example: Test Organization
+            displayName:
+              type: string
+              description: The display name of the organization.
+              maxLength: 512
+              minLength: 3
+              example: Test Org
+            identification:
+              type: object
+              description: The organization identification
+              allOf:
+                - $ref: "#/components/schemas/organizationIdentification"
+            address:
+              type: object
+              required:
+                - countryCode
+                - city
+              description: A postal address
+              properties:
+                countryCode:
+                  type: string
+                  description: ISO 3166-1 country code
+                  maxLength: 2
+                  example: AT
+                city:
+                  type: string
+                  description: The name of the city
+                  maxLength: 64
+                  example: Graz
+
+    customerSetupVoucherSearchResult:
+      type: object
+      properties:
+        type:
+          type: string
+          example: "customerSetupVoucher"
+          enum:
+            - customerSetupVoucher
+        customerSetupVoucher:
+          type: object
+          properties:
+            id:
+              type: string
+              description: The id of the customer setup voucher.
+              maxLength: 64
+              readOnly: true
+              format: uuid
+              example: b76e0899-a826-4779-a61a-14b62c77e61f
+            proposedOrganizationName:
+              type: string
+              description: The name of the proposed organization.
+              maxLength: 512
+              minLength: 3
+              example: Test Organization
+            originOrganizationName:
+              type: string
+              description: The name of the origin organization.
+              maxLength: 512
+              minLength: 3
+              example: Test Organization
+            status:
+              $ref: '#/components/schemas/customerSetupVoucherStatus'
+            createdByAdmin:
+              type: boolean
+              readOnly: true
+              description: Specifies if a voucher was created by an admin
+
+    customerSetupVoucherSearchRequest:
+      type: object
+      properties:
+        sort:
+          type: array
+          items:
+            type: object
+            required:
+              - field
+              - order
+            properties:
+              field:
+                type: string
+                enum:
+                  - TYPE
+                  - ORIGIN
+                  - INTENDED_CUSTOMER
+                  - REDEEMING_CUSTOMER
+                  - NEW_CUSTOMER
+                  - CUSTOMER_CONTACT
+                  - LAST_STATUS_CHANGE
+                  - STATUS
+              order:
+                type: string
+                enum:
+                  - ASC
+                  - DESC
+        filter:
+          type: array
+          items:
+            type: object
+            required:
+              - field
+              - value
+              - matchMode
+            properties:
+              field:
+                type: string
+                enum:
+                  - TYPE
+                  - ORIGIN
+                  - INTENDED_CUSTOMER
+                  - REDEEMING_CUSTOMER
+                  - NEW_CUSTOMER
+                  - CUSTOMER_CONTACT
+                  - LAST_STATUS_CHANGE
+                  - STATUS
+              value:
+                oneOf:
+                  - type: string
+                  - type: boolean
+              matchMode:
+                type: string
+                enum:
+                  - CONTAINS
+                  - BEFORE
+                  - AFTER
+                  - EQUALS
+
+    userInvitation:
+      type: object
+      required:
+        - id
+        - customerId
+        - email
+        - name
+        - roles
+        - expiresAt
+        - status
+        - createdAt
+        - modifiedAt
+        - mailSentCount
+        - possibleActions
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 842472e0-be98-46a2-9dfd-f81413bcdb2c
+          readOnly: true
+        customerId:
+          type: string
+          format: uuid
+          example: 9b68f6dd-a6c4-4662-90fd-f3750dc7c606
+          readOnly: true
+        roles:
+          type: array
+          items:
+            type: string
+            example: business-admin
+            minItems: 1
+        email:
+          type: string
+          description: The email of the user who receives the invitation.
+          format: email
+          maxLength: 512
+          example: user@example.com
+        name:
+          type: string
+          description: The email of the user who receives the invitation.
+          maxLength: 512
+          example: Max Huber
+        status:
+          type: string
+          description: |
+            The current status of the invitation. Possible values are:
+
+            - `CREATED`
+            - `DELIVERED`
+            - `PROCESSING`
+            - `FAILED`
+            - `ACCEPTED`
+            - `WITHDRAWN`
+
+          example: ACCEPTED
+          readOnly: true
+        validityPeriod:
+          type: string
+          description: >
+            The period (duration) the user invitation should be valid.
+            Formatted as an ISO 8601 duration.
+          default: P7D
+          example: P3W
+          writeOnly: true
+        expiresAt:
+          type: string
+          format: date-time
+          description: The expiration timestamp of the user invitation.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the user invitation.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        modifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of the last time the user invitation got modified.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        mailSentCount:
+          type: number
+          description: The number of attempts made to send the invitation mail.
+          example: 1
+          readOnly: true
+        possibleActions:
+          $ref: "#/components/schemas/userInvitationPossibleActions"
+
+    customerAdditionalUserIdentification:
+      type: object
+      required:
+        - items
+        - paging
+        - result
+      properties:
+        items:
+          type: array
+          items:
+            allOf:
+              - $ref: "#/components/schemas/simpleUser"
+              - type: object
+                required:
+                  - result
+                properties:
+                  result:
+                    type: string
+                    description: |
+                      The result of the additional user identification. Possible Values are:
+                      - `USER_CAN_BE_ADDED` - The user exists and can be added to this customer.
+                      - `USER_ASSIGNED_TO_THIS_CUSTOMER` - The user exists but is already assigned to this customer.
+                      - `USER_ASSIGNED_TO_DIFFERENT_CUSTOMER` - The user exists but is already assigned to a different customer.
+                    example: USER_CAN_BE_ADDED
+        paging:
+          $ref: "#/components/schemas/pageMetadata"
+        result:
+          type: string
+          description: |
+            The result of the additional user identification. Possible Values are:
+            - `USER_CAN_BE_ADDED` - The user exists and can be added to this customer.
+            - `USER_ASSIGNED_TO_THIS_CUSTOMER` - The user exists but is already assigned to this customer.
+            - `USER_ASSIGNED_TO_DIFFERENT_CUSTOMER` - The user exists but is already assigned to a different customer.
+            - `INVITATION_CAN_BE_SENT` - The user does not exist yet but a user invitation can be sent to this email.
+            - `USER_ALREADY_INVITED` - The user does not exist yet and a user invitation was already sent out for this email and customer. Another user invitation can be sent nevertheless.
+            - `NO_MATCHES_FOUND` - The search term is not a valid email and does not return any existing user matches.
+            - `INVALID_EMAIL` - The search term is not a valid email, but existing users are found for this substring.
+          example: USER_CAN_BE_ADDED
+
+    customerInvitation:
+      type: object
+      required:
+        - recipient
+        - designatedPartyRoles
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of the customer invitation
+          readOnly: true
+        recipient:
+          type: object
+          required:
+            - organization
+            - contactPerson
+          properties:
+            organization:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: Test Organization
+                  minLength: 3
+                  maxLength: 512
+                  description: The proposed name of the organization which receives this invitation.
+                city:
+                  type: string
+                  example: Vienna
+                  maxLength: 255
+                  description: The proposed city of the organization which receives this invitation.
+                countryCode:
+                  type: string
+                  example: AT
+                  maxLength: 2
+                  description: ISO 3166-1 country code of the proposed country of the organization which receives this invitation.
+            contactPerson:
+              type: object
+              required:
+                - email
+                - name
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: test@email.com
+                  maxLength: 255
+                  description: The email of the user who receives this invitation.
+                name:
+                  type: string
+                  example: Mr. Test
+                  maxLength: 512
+                  description: The name of the user who receives this invitation. Will be used in the salutation of the email.
+
+        designatedPartyRoles:
+          type: array
+          items:
+            type: string
+            enum:
+              - SHIPPER
+              - CARRIER
+            example: SHIPPER
+            minItems: 0
+          description: |
+            The party roles, which are asssigned to the Customer this Customer Invitation lead to. Possible values are:
+            - `SHIPPER`
+            - `CARRIER`
+        destination:
+          type: string
+          enum:
+            - TSER
+            - ECMR
+            - GPSA_COLLABORATION
+            - GPSA_FLEET
+
+          description: The destination the customer gets redirected to, internally gets mapped to a callbackUrl
+          writeOnly: true
+        info:
+          type: string
+          maxLength: 512
+          description: Optional info text that will be added in the email.
+        validityPeriod:
+          type: string
+          description: >
+            The period (duration) the customer invitation should be valid.
+            Formatted as an ISO 8601 duration.
+          default: P30D
+          example: P30D
+          writeOnly: true
+
+    createCustomerSetupVoucher:
+      type: object
+      required:
+        - type
+        - payload
+      properties:
+        type:
+          type: string
+          enum:
+            - CUSTOMER_INVITATION
+        payload:
+          $ref: '#/components/schemas/customerInvitation'
+
+    customerSetupVoucher:
+      type: object
+      required:
+        - id
+        - status
+        - type
+        - externalId
+        - intendedCustomer
+        - origin
+        - designatedPartyRoles
+        - customerCreated
+        - createdAt
+        - modifiedAt
+        - expiresAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of the customer setup voucher
+          readOnly: true
+        status:
+          $ref: "#/components/schemas/customerSetupVoucherStatus"
+        type:
+          type: string
+          enum:
+            - CUSTOMER_INVITATION
+            - REFERRAL
+          description: |
+            The type of the voucher
+            * `CUSTOMER_INVITATION` - The customer setup voucher represents a customer invitation
+            * `REFERRAL` - The customer setup voucher represents a referral
+          example: CUSTOMER_INVITATION
+          readOnly: true
+        externalId:
+          type: string
+          description: The external-id of the customer setup voucher
+          example: external-id
+        intendedCustomer:
+          type: object
+          required:
+            - proposedData
+            - contactPerson
+          properties:
+            proposedData:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: Test Organization
+                  minLength: 3
+                  maxLength: 512
+                  description: The name of the organization which receives this voucher.
+                countryCode:
+                  type: string
+                  description: ISO 3166-1 country code
+                  maxLength: 2
+                  example: AT
+                city:
+                  type: string
+                  description: The name of the city
+                  maxLength: 255
+                  example: Graz
+                postalCode:
+                  type: string
+                  description: The postal code
+                  maxLength: 16
+                  example: 8010
+                street:
+                  type: string
+                  description: The name of the street
+                  maxLength: 64
+                  example: Abraham-A-Sancta-Clara-Gasse
+                houseNumber:
+                  type: string
+                  description: The house number
+                  maxLength: 64
+                  example: 2
+                additionalInformation:
+                  type: string
+                  description: Additional information to the address (Suite/Unit/etc)
+                  maxLength: 255
+                  example: Suite 197A
+                identification:
+                  type: object
+                  required:
+                    - vatId
+                  properties:
+                    vatId:
+                      type: string
+                      minLength: 4
+                      maxLength: 64
+            contactPerson:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: test@email.com
+                  maxLength: 255
+                  description: The email of the user who receives this customer setup voucher.
+                name:
+                  type: string
+                  example: Mr. Test
+                  maxLength: 512
+                  description: The name of the user who receives this customer setup voucher.
+            user:
+              type: object
+              description: The matching user of the contact person's email
+              allOf:
+                - $ref: "#/components/schemas/simpleUser"
+              properties:
+                customer:
+                  type: object
+                  required:
+                    - id
+                    - organization
+                  properties:
+                    id:
+                      type: string
+                      format: uuid
+                      description: The id of the customer
+                      readOnly: true
+                    organization:
+                      required:
+                        - id
+                      allOf:
+                        - $ref: "#/components/schemas/simpleOrganization"
+        redeemingCustomer:
+          type: object
+          description: The customer information which redeemed this voucher
+          properties:
+            organization:
+              type: object
+              description: The redeeming organization of this voucher
+              required:
+                - id
+                - identification
+              allOf:
+                - $ref: "#/components/schemas/simpleOrganization"
+              properties:
+                postalCode:
+                  type: string
+                  description: The postal code
+                  maxLength: 16
+                  example: 8010
+                street:
+                  type: string
+                  description: The name of the street
+                  maxLength: 64
+                  example: Abraham-A-Sancta-Clara-Gasse
+                houseNumber:
+                  type: string
+                  description: The house number
+                  maxLength: 64
+                  example: 2
+                additionalInformation:
+                  type: string
+                  description: Additional information to the address (Suite/Unit/etc)
+                  maxLength: 255
+                  example: Suite 197A
+                identification:
+                  type: object
+                  description: The organization identification
+                  allOf:
+                    - $ref: "#/components/schemas/organizationIdentification"
+            user:
+              type: object
+              description: The redeeming user of this voucher
+              allOf:
+                - $ref: "#/components/schemas/simpleUser"
+        origin:
+          type: object
+          description: Information about the origin customer
+          properties:
+            organization:
+              type: object
+              readOnly: true
+              description: The origin organization of this voucher
+              allOf:
+                - $ref: "#/components/schemas/simpleOrganization"
+              properties:
+                error:
+                  $ref: "#/components/schemas/customerSetupVoucherOriginCustomerError"
+            user:
+              type: object
+              readOnly: true
+              description: The origin user of this voucher
+              allOf:
+                - $ref: "#/components/schemas/simpleUser"
+        customerCreationAttempt:
+          $ref: "#/components/schemas/customerSetupData"
+        conflictingOrganization:
+          $ref: "#/components/schemas/readOrganization"
+        identification:
+          type: object
+          description: The organization identification process of the redeeming customer or setup data
+          allOf:
+            - $ref: "#/components/schemas/organizationIdentification"
+          properties:
+            status:
+              type: string
+              enum:
+                - VALID
+                - INVALID
+                - VALIDATION_NEEDED
+                - VALIDATION_NOT_NEEDED
+                - VAT_VALIDATION_PENDING
+                - VAT_VALIDATION_FAILED
+              description: |
+                The current status of the organization identification validation
+                * `VALID` - The VAT-ID has been validated and is valid.
+                * `INVALID` - The VAT-ID has been validated and is invalid.
+                * `VALIDATION_NEEDED` - The VAT-ID has not been validated yet and there is no active validation in progress.
+                * `VALIDATION_NOT_NEEDED` - The VAT-ID needs no validation.
+                * `VAT_VALIDATION_PENDING` - The automatic validation of the VAT-ID is in progress and pending.
+                * `VAT_VALIDATION_FAILED` - The automatic validation of the VAT-ID failed.
+              example: VALID
+              readOnly: true
+            manualValidationNote:
+              type: string
+              minLength: 1
+              maxLength: 5000
+              example: Manual validation note
+            createdAt:
+              type: string
+              format: date-time
+              description: The creation timestamp of the identification validation
+              readOnly: true
+              example: "2020-12-18T09:19:08.415Z"
+            modifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of the last time the identification validation got modified.
+              readOnly: true
+              example: "2020-12-18T09:19:08.415Z"
+            validatedBy:
+              type: object
+              description: Which system or user validated the VAT-ID
+              properties:
+                manually:
+                  type: object
+                  description: The user that validated the VAT-ID
+                  required:
+                    - id
+                    - email
+                  properties:
+                    id:
+                      type: string
+                      description: The user id of the user
+                      readOnly: true
+                    email:
+                      type: string
+                      format: email
+                      example: test@email.com
+                      maxLength: 255
+                      description: The email of the user
+                    firstName:
+                      type: string
+                      description: The first name of the user
+                      maxLength: 512
+                      example: Max
+                    lastName:
+                      type: string
+                      description: The last name of the user
+                      maxLength: 512
+                automatically:
+                  type: object
+                  description: The system that validated the VAT-ID
+                  required:
+                    - systemIdentifier
+                  properties:
+                    systemIdentifier:
+                      type: string
+                      enum:
+                        - VATSTACK
+                      description: Name of the system that validated the VAT-ID
+                      example: VATSTACK
+                      readOnly: true
+        vatstackData:
+          type: object
+          description: Response information from VatStack VAT-ID validation.
+          properties:
+            organizationName:
+              type: string
+              description: The registered company name for the VAT-ID
+              example: Registered Company Name
+              readOnly: true
+            consultationNumber:
+              type: string
+              description: The consultation number for the VAT-ID validation
+              example: 237865235352
+              readOnly: true
+            externalId:
+              type: string
+              description: The external id for the VAT-ID validation
+              example: some_external_id
+              readOnly: true
+            responseCode:
+              type: string
+              description: The response code for the VAT-ID validation
+              example: 237865235352
+              readOnly: true
+            responseMessage:
+              type: string
+              description: The response message for the VAT-ID validation
+              example: some_external_id
+              readOnly: true
+        designatedPartyRoles:
+          type: array
+          items:
+            type: string
+            enum:
+              - SHIPPER
+              - CARRIER
+            example: CARRIER, SHIPPER
+            minItems: 0
+          description: |
+            The party roles, which are asssigned to the Customer this Customer Invitation lead to. Possible values are:
+            - `SHIPPER`
+            - `CARRIER`
+        callbackUrl:
+          type: string
+          example: https://www.veroo.io
+          maxLength: 2048
+          description: The destination url the application will redirect to after the voucher was redeemed.
+        expiresAt:
+          type: string
+          format: date-time
+          description: The expiration timestamp of the customer setup voucher.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the customer setup voucher.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        modifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of the last time the customer setup voucher got modified.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        customerCreated:
+          type: boolean
+          description: The flag if a customer has been created with the customer setup voucher or not.
+          readOnly: true
+          example: false
+        info:
+          type: string
+          maxLength: 512
+          description: Optional info text that will be added in the email.
+        possibleActions:
+          $ref: "#/components/schemas/customerSetupVoucherPossibleActions"
+        createdByAdmin:
+          type: boolean
+          readOnly: true
+          description: Specifies if a voucher was created by an admin
+
+    simpleOrganization:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of the organization
+          readOnly: true
+        name:
+          type: string
+          example: Test Organization
+          minLength: 3
+          maxLength: 512
+          description: The name of the organization
+        city:
+          type: string
+          example: Vienna
+          maxLength: 255
+          description: The city of the organization
+        countryCode:
+          type: string
+          example: AT
+          maxLength: 2
+          description: ISO 3166-1 country code of the country of the organization
+
+    simpleUser:
+      type: object
+      required:
+        - id
+        - email
+      properties:
+        id:
+          type: string
+          description: The user id of the user
+          readOnly: true
+        email:
+          type: string
+          format: email
+          example: test@email.com
+          maxLength: 255
+          description: The email of the user
+        firstName:
+          type: string
+          description: The first name of the user
+          maxLength: 512
+          example: Max
+        lastName:
+          type: string
+          description: The last name of the user
+          maxLength: 512
+          example: Huber
+
+    customerSetupVoucherSearchResponse:
+      type: object
+      required:
+        - id
+        - type
+        - intendedCustomer
+        - customerCreated
+        - customerContact
+        - status
+        - modifiedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of the customer setup voucher
+          readOnly: true
+        type:
+          type: string
+          enum:
+            - CUSTOMER_INVITATION
+            - REFERRAL
+          description: The type of the customer setup voucher
+          example: CUSTOMER_INVITATION
+          readOnly: true
+        origin:
+          type: object
+          required:
+            - partyId
+          properties:
+            partyId:
+              type: string
+              format: uuid
+              description: The party id of the origin customer. Since this id is set by external domains, it can happen that no party with this id is known to the party-service.
+              readOnly: true
+            name:
+              type: string
+              example: Origin Customer
+              minLength: 3
+              maxLength: 512
+              description: The organization name of the origin customer.
+            error:
+              $ref: "#/components/schemas/customerSetupVoucherOriginCustomerError"
+        intendedCustomer:
+          type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              example: Intended Customer
+              minLength: 3
+              maxLength: 512
+              description: The organization name of the intended customer.
+        redeemingCustomer:
+          type: object
+          required:
+            - partyId
+            - name
+          properties:
+            partyId:
+              type: string
+              format: uuid
+              description: The party id of the redeeming customer.
+              readOnly: true
+            name:
+              type: string
+              example: Redeeming Customer
+              minLength: 3
+              maxLength: 512
+              description: The organization name of the redeeming customer.
+        status:
+          $ref: "#/components/schemas/customerSetupVoucherStatus"
+        customerContact:
+          type: object
+          required:
+            - simpleContact
+          properties:
+            simpleContact:
+              type: object
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: test@email.com
+                  maxLength: 255
+                  description: The email of the customer contact.
+                name:
+                  type: string
+                  example: Mr. Test
+                  maxLength: 512
+                  description: The name of the customer contact.
+            userContact:
+              type: object
+              required:
+                - id
+                - email
+              properties:
+                id:
+                  type: string
+                  description: The id of the user matching the email.
+                  maxLength: 64
+                  readOnly: true
+                  example: email|5f36843ed950a870a431990d
+                email:
+                  type: string
+                  description: The email of the user.
+                  format: email
+                  example: user@example.com
+                firstName:
+                  type: string
+                  description: The first name of the user.
+                  maxLength: 512
+                  example: Max
+                lastName:
+                  type: string
+                  description: The last name of the user.
+                  maxLength: 512
+                  example: Huber
+                customerId:
+                  type: string
+                  description: The ID of the associated customer
+                  format: uuid
+        modifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of the last time the customer setup voucher got modified.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        customerCreated:
+          type: boolean
+          description: The flag if a new customer has been created in the course of this voucher.
+          readOnly: true
+          example: false
+        possibleActions:
+          $ref: "#/components/schemas/customerSetupVoucherPossibleActions"
+        createdByAdmin:
+          type: boolean
+          readOnly: true
+          description: Specifies if a voucher was created by an admin
+
+    customerSetupVoucherLog:
+      type: object
+      required:
+        - id
+        - createdAt
+        - action
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 842472e0-be98-46a2-9dfd-f81413bcdb2c
+          nullable: false
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the log entry.
+          readOnly: true
+          nullable: false
+          example: "2020-12-18T09:19:08.415Z"
+        action:
+          type: string
+          enum:
+            - CREATED
+            - OPENED
+            - REDEEMED
+            - MANUALLY_REDEEMED
+            - WITHDRAWN
+            - IDENTITY_COLLISION
+            - IDENTITY_VALIDATION_NEEDED
+            - VAT_VALIDATION_PENDING
+            - NEW_CUSTOMER_CREATED
+            - USER_NOT_FOUND
+            - VOUCHER_IS_NOT_MEANT_FOR_USER
+            - USER_IS_NOT_ASSOCIATED_TO_REDEEMING_CUSTOMER
+            - UPDATED
+            - UPDATE_REJECTED
+            - EXPIRED
+            - EXTENDED
+            - VATSTACK_VALID
+            - VATSTACK_INVALID
+            - VATSTACK_ERROR
+            - MANUALLY_VALIDATED_IDENTITY
+            - MANUALLY_RETRY_VAT_VALIDATION
+            - MANUALLY_UPDATED_VAT_ID
+            - REJECTED
+            - COUNTRY_NOT_SUPPORTED
+            - CUSTOMER_INVITATION_EMAIL_PROCESSING
+            - CUSTOMER_INVITATION_EMAIL_DELIVERED
+            - CUSTOMER_INVITATION_EMAIL_FAILED
+            - CUSTOMER_ONBOARDING_COMPLETED_EMAIL_PROCESSING
+            - CUSTOMER_ONBOARDING_COMPLETED_EMAIL_DELIVERED
+            - CUSTOMER_ONBOARDING_COMPLETED_EMAIL_FAILED
+          description: |
+            The action why the log was written.
+            * `CREATED` - The voucher was succesfully created
+            * `INVITATION_EMAIL_SENT` - invitation only - The invitation email was succesfully sent to the recipient's email address
+            * `INVITATION_EMAIL_FAILED` - invitation only - There was an attempt at sending the invitation email, but Mailjet returned an error
+            * `OPENED` - invitation only - The recipient has opened the invitation link and logged in
+            * `REDEEMED` - The recipient successfully redeemed the voucher with a new or existing customer
+            * `MANUALLY_REDEEMED` - The voucher has been manually redeemed by an admin
+            * `WITHDRAWN` - The voucher has been withdrawn
+            * `IDENTITY_COLLISION` - The recipient tried to create a new organization with a vat-id that already exists
+            * `IDENTITY_VALIDATION_NEEDED` - The recipient tried to create a new organization with a non vat-id identification number that needs to be validated manually
+            * `VAT_VALIDATION_PENDING` - The recipient tried to create a new organization with a vat-id, but VatStack could not return an immediate validation response
+            * `NEW_CUSTOMER_CREATED` - A new customer was created with this voucher
+            * `USER_NOT_FOUND` - User not synchronised from Auth0 (To resolve: User needs to login again)
+            * `VOUCHER_IS_NOT_MEANT_FOR_USER` - invitation only - User that opens invitation is not the user that was invited
+            * `USER_IS_NOT_ASSOCIATED_TO_REDEEMING_CUSTOMER` - This User is not associated to the redeeming customer
+            * `UPDATED` - referral only - The referral with status CREATED was updated by a referral with the same external-id
+            * `UPDATE_REJECTED` - referral only - Update to the referral was rejected because the referral status was not CREATED anymore
+            * `EXPIRED` - The voucher has expired
+            * `MANUALLY_VALIDATED_IDENTITY` - The voucher was manually set to valid
+            * `MANUALLY_RETRY_VAT_VALIDATION` - VAT Validation was retried
+            * `MANUALLY_UPDATED_VAT_ID` - The VAT-ID of the voucher was changed
+            * `REJECTED` - The voucher has been rejected
+            * `COUNTRY_NOT_SUPPORTED` - The recipient tried to create a new organization with a country that is not supported yet by Veroo.
+            * `CUSTOMER_INVITATION_EMAIL_PROCESSING` - The invitation email is currently being processed
+            * `CUSTOMER_INVITATION_EMAIL_DELIVERED` - The invitation email was delivered
+            * `CUSTOMER_INVITATION_EMAIL_FAILED` - The invitation email failed
+            * `CUSTOMER_ONBOARDING_COMPLETED_EMAIL_PROCESSING` - The onboarding completed is currently being processed
+            * `CUSTOMER_ONBOARDING_COMPLETED_EMAIL_DELIVERED` - The onboarding completed email was delivered
+            * `CUSTOMER_ONBOARDING_COMPLETED_EMAIL_FAILED` - The onboarding completed email failed
+          example: REDEEMED
+          nullable: false
+          readOnly: true
+        newExpirationDate:
+          type: string
+          format: date-time
+          description: The new expiration date of the voucher, in case it has changed.
+          example: "2020-12-18T09:19:08.415Z"
+          readOnly: true
+        payload:
+          type: string
+          description: The referral provided via pubsub on CREATED, UPDATED or UPDATE_REJECTED action in json format
+          readOnly: true
+        user:
+          type: object
+          description: Depending on the action either the sender, recipient or admin user.
+          required:
+            - id
+          properties:
+            id:
+              type: string
+              description: The id of the user.
+              maxLength: 64
+              readOnly: true
+              nullable: false
+              example: email|5f36843ed950a870a431990d
+            # email cannot be required, since it is possible that a user id is stored on a log entry,
+            # where the user cannot be found in the db and therefore the email cannot be resolved
+            email:
+              type: string
+              format: email
+              nullable: false
+              example: test@email.com
+              maxLength: 255
+              description: The email of the user.
+
+    customerSetupData:
+      type: object
+      readOnly: true
+      properties:
+        identification:
+          type: object
+          description: The organization identification
+          allOf:
+            - $ref: "#/components/schemas/organizationIdentification"
+        name:
+          type: string
+          example: Test Organization
+          minLength: 3
+          maxLength: 512
+          description: The name of the customer the user tried to onboard, but had a duplicate vat id.
+        city:
+          type: string
+          example: Vienna
+          maxLength: 255
+          description: The city of the duplicate customer.
+        countryCode:
+          type: string
+          example: AT
+          maxLength: 2
+          description: ISO 3166-1 country code of the country of the duplicate customer.
+        postalCode:
+          type: string
+          description: The postal code of the duplicate customer's address.
+          maxLength: 16
+          example: 8010
+        street:
+          type: string
+          description: The name of the street of the duplicate customer's address.
+          maxLength: 64
+          example: Abraham-A-Sancta-Clara-Gasse
+        houseNumber:
+          type: string
+          description: The house number of the duplicate customer's address.
+          maxLength: 64
+          example: 2
+        additionalInformation:
+          type: string
+          description: Additional information to the duplicate customer's address (Suite/Unit/etc).
+          maxLength: 255
+          example: Suite 197A
+
+    customerSetupVoucherStatus:
+      type: string
+      enum:
+        - CREATED
+        - IDENTITY_COLLISION
+        - IDENTITY_VALIDATION_NEEDED
+        - VAT_VALIDATION_PENDING
+        - REDEEMED
+        - MANUALLY_REDEEMED
+        - WITHDRAWN
+        - EXPIRED
+        - OPENED
+        - REJECTED
+        - COUNTRY_NOT_SUPPORTED
+        - CUSTOMER_INVITATION_EMAIL_PROCESSING
+        - CUSTOMER_INVITATION_EMAIL_DELIVERED
+        - CUSTOMER_INVITATION_EMAIL_FAILED
+      description: |
+        The current status of the voucher
+        * `CREATED` - The voucher was succesfully created
+        * `IDENTITY_COLLISION` - There was an attempt to create a new organization with a vat-id that already exists
+        * `IDENTITY_VALIDATION_NEEDED` - There was an attempt to create a new organization with a non vat-id identification number that needs to be validated manually
+        * `VAT_VALIDATION_PENDING` - There was an attempt to create a new organization with a vat-id, but VatStack could not return an immediate validation response
+        * `REDEEMED` - The voucher was successfully redeemed
+        * `MANUALLY_REDEEMED` - The voucher was manually redeemed by an admin
+        * `WITHDRAWN` - The voucher was withdrawn
+        * `EXPIRED` - The voucher is expired* `OPENED` - The recipient has opened the invitation link, logged in with an user and started the invitation process (Customer Invitation only.)
+        * `REJECTED` - The voucher was rejected
+        * `COUNTRY_NOT_SUPPORTED` - There was an attempt to create a new organization with a country that is not supported yet by Veroo.
+        * `CUSTOMER_INVITATION_EMAIL_PROCESSING` - The invitation email is currently being processed
+        * `CUSTOMER_INVITATION_EMAIL_DELIVERD` - The invitation email was delivered
+        * `CUSTOMER_INVITATION_EMAIL_FAILED` - The invitation email failed
+
+    customerSetupVoucherOriginCustomerError:
+      type: string
+      enum:
+        - MISSING_PARTY
+        - UNKNOWN_PARTY
+        - NO_CUSTOMER
+      description: |
+        Error Code that indicates problems concerning the origin customer
+        * `MISSING_PARTY` - No party-id was given at all for this customer setup voucher
+        * `UNKNOWN_PARTY` - No party for the given party-id was found
+        * `NO_CUSTOMER` - For the given party-id the customer role is missing
+      example: NO_CUSTOMER
+      readOnly: true
+
+    customerSetupVoucherPossibleActions:
+      type: array
+      items:
+        type: string
+        enum:
+          - REDEEM
+          - WITHDRAW
+          - SEND_CUSTOMER_ONBOARDING_INVITATION
+          - SEND_CUSTOMER_ONBOARDING_COMPLETED
+          - SEND_CUSTOMER_ONBOARDING_REOPENED
+          - EXTEND
+          - RESOLVE_IDENTITY_COLLISION
+          - REJECT
+          - REOPEN
+        description: |
+          Indicates which actions can be performed on this voucher
+        example: REDEEM
+        readOnly: true
+
+    userInvitationPossibleActions:
+      type: array
+      items:
+        type: string
+        enum:
+          - WITHDRAW
+          - RESEND
+        description: |
+          Indicates which actions can be performed on this user invitation
+        example: WITHDRAW
+        readOnly: true
+
+    organizationIdentification:
+      type: object
+      required:
+        - vatId
+        - type
+      description: The id used to validate an organization
+      properties:
+        vatId:
+          type: string
+          description: The VAT identification value (Value Added Tax Registration Number)
+          example: ATU1234567
+          readOnly: true
+          minLength: 4
+          maxLength: 64
+        type:
+          type: string
+          enum:
+            - EU_VAT
+            - AU_GST
+            - CH_VAT
+            - GB_VAT
+            - NO_VAT
+            - AL_NIPT
+            - BY_INN
+            - BA_JIB
+            - GE_TRN
+            - MK_TIN
+            - MD_IDNO
+            - ME_RB
+            - RU_INN
+            - RS_VAT
+            - TR_MN
+            - UA_VAT
+            - ORG_INTERNAL
+          readOnly: true
+          description: The type of the ID
+          example: EU_VAT
+
+    identificationHistory:
+      type: object
+      required:
+        - identification
+      properties:
+        identification:
+          description: The organization identification itself
+          required:
+            - id
+            - status
+            - createdAt
+            - modifiedAt
+            - archived
+            - validatedBy
+          allOf:
+            - $ref: "#/components/schemas/organizationIdentification"
+          properties:
+            id:
+              type: string
+              format: uuid
+            status:
+              type: string
+              description: The status of this organization-identification-validation
+              enum:
+                - VALID
+                - INVALID
+                - VALIDATION_NEEDED
+                - VALIDATION_NOT_NEEDED
+                - VAT_VALIDATION_PENDING
+                - VAT_VALIDATION_FAILED
+              example: VAT_VALIDATION_PENDING
+            manualValidationNote:
+              type: string
+              minLength: 1
+              maxLength: 5000
+              example: Manual validation note
+            createdAt:
+              type: string
+              format: date-time
+            modifiedAt:
+              type: string
+              format: date-time
+            archivedAt:
+              type: string
+              format: date-time
+              nullable: true
+            archived:
+              type: boolean
+            validatedBy:
+              description: Contains information about who validated this organization identification
+              properties:
+                manually:
+                  description: Optional, exists if the organization identification was manually validated, includes the properties of the user that validated
+                  properties:
+                    id:
+                      type: string
+                    email:
+                      type: string
+                      example: "test@email.com"
+                    firstName:
+                      type: string
+                      example: "Max"
+                    lastName:
+                      type: string
+                      example: "Mustermann"
+                automatically:
+                  description:  Optional, exists if the organization identification was automatically validated
+                  properties:
+                    systemidentifier:
+                      type: string
+                      example: "VATSTACK"
+                      description: The identifier of the automatic system that was used to validate
+        vatstackData:
+          type: object
+          description: Optional, only exists if this organization identification was processed by vatstack
+          properties:
+            organizationName:
+              type: string
+              example: "Registered Company Name"
+            consultationNumber:
+              type: string
+              example: "WAPIAAAAW21qsOHW"
+            externalId:
+              type: string
+              example: "some_external_id"
+            responseCode:
+              type: string
+              example: MS_UNAVAILABLE
+            responseMessage:
+              type: string
+        customerCreationAttempt:
+          $ref: "#/components/schemas/customerSetupData"
+
+    customerSetupInquiry:
+      type: object
+      required:
+        - id
+        - voucherId
+        - text
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        voucherId:
+          type: string
+          format: uuid
+          description: The id of the corresponding customer setup voucher
+        text:
+          type: string
+          description: The customer setup inquiry (contains organization and contact information)
+          example: Winter Transporte GmbH - example street 123, 8102 city - Max Mustermann (max.mustermann@email.com)
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the customer setup inquiry.
+          example: "2020-12-18T09:19:08.415Z"
+
+    problem:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: >
+            A absolute URI reference [RFC 3986] that identifies the problem type.
+          default: "about:blank"
+          example: "https://veroo.io/problems/constraint-violation"
+        title:
+          type: string
+          description: >
+            A short, human-readable summary of the problem type.
+          example: Service Unavailable
+        status:
+          type: integer
+          format: int32
+          description: >
+            The HTTP status code generated by the origin server for this occurrence
+            of the problem.
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+          example: 404
+        detail:
+          type: string
+          description: >
+            A human readable explanation specific to this occurrence of the
+            problem.
+          example: Connection to database timed out
+        instance:
+          type: string
+          format: uri
+          description: >
+            An absolute URI that identifies the specific occurrence of the problem.
+            It may or may not yield further information if dereferenced.
