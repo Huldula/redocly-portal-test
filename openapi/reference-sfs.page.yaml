@@ -1,5 +1,5 @@
 type: reference-docs
-definitionId: self-service-v1
+definitionId: sfs
 settings:
   generateCodeSamples:
     languages:
