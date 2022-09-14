@@ -1,0 +1,1710 @@
+openapi: "3.0.2"
+info:
+  title: Veroo Self Service API
+  version: "0.1"
+  description: This is an ORG domain internal api. Breaking changes may occur at any time.
+servers:
+  - url: https://self-service.org.veroo.io/v1
+  - url: https://party-service.org.veroo.io/self-service/v1
+paths:
+  /user-invitations/{id}:
+    description: This resource represents a user invitation.
+    get:
+      tags:
+        - User Invitations
+      operationId: getUserInvitation
+      summary: Get a user invitation by id
+      description: Load details for a given user invitation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the user invitation
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully loaded user invitation.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/userInvitationResponse"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /user-invitations/{id}/accept:
+    description: This resource is used to accept user invitations.
+    post:
+      tags:
+        - User Invitations
+      operationId: postUserInvitationAccept
+      summary: Accept user invitation
+      description: Accept user invitation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The user invitation id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "201":
+          description: User Invitation accepted
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/acceptUserInvitationResponse"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/IncorrectUserEmail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /customer-setup-vouchers:
+    description: This resource represents Customer Setup Vouchers.
+    get:
+      tags:
+        - Customer Setup Vouchers
+      summary: Get Customer Setup Voucher including Payload
+      operationId: getCustomerSetupVoucherById
+      description: Get Customer Setup Voucher including Payload
+      parameters:
+        - in: query
+          name: external-id
+          deprecated: true
+          required: true
+          description: The external id of the customer setup voucher
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: external_id
+          required: true
+          description: The external id of the customer setup voucher
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successfully loaded customer setup vouchers
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerSetupVoucher"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /customer-setup-vouchers/{id}:
+    description: This resource represents a Customer Setup Voucher.
+    get:
+      tags:
+        - Customer Setup Vouchers
+      summary: Get Customer Setup Vouchers including Payload
+      operationId: getCustomerSetupVouchers
+      description: Get Customer Setup Vouchers including Payload
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the customer setup voucher
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Successfully loaded customer setup voucher
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerSetupVoucher"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /customer-setup-vouchers/{id}/redeem:
+    post:
+      tags:
+        - Customer Setup Vouchers
+      summary: Redeem Customer Setup Voucher
+      operationId: redeemCustomerSetupVouchers
+      description: Redeem Customer Setup Voucher
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The id of the customer setup voucher
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "201":
+          description: Successfully redeemed customer setup voucher
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/redeemCustomerSetupVoucherResponse"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /customer-invitations:
+    description: This resource represents Customer Invitations.
+    post:
+      tags:
+        - Customer Invitations
+      summary: Create Customer Invitation
+      operationId: postCustomerInvitation
+      description: Create Customer Invitation
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/customerInvitation"
+      responses:
+        "201":
+          description: Customer Invitation created
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerInvitation"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    get:
+      tags:
+        - Customer Invitations
+      summary: Get Customer Invitations
+      operationId: getCustomerInvitations
+      description: Get all Customer Invitations that were sent out by a Customer (the calling User can only see those if he is associated with this customer)
+      parameters:
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+        - in: query
+          name: customer_id
+          required: true
+          description: The customer id of the organization.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully loaded customer invitations
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                  - paging
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/customerInvitation"
+                  paging:
+                    $ref: "#/components/schemas/paging"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /customer-invitations/{id}/logs:
+    description: This resource represents Customer Invitation Logs.
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: The id of the customer invitation
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Customer Invitations
+      summary: Get Customer Invitation Logs
+      operationId: getCustomerInvitationLogs
+      description: Get Customer Invitation Logs by Customer Invitation id
+      parameters:
+        - in: query
+          name: offset
+          required: false
+          description: |
+            The (zero-based) offset is the number of elements skipped before the first element included in the response.
+            Omitting the offset parameter will assume the offset is 0.
+          schema:
+            type: integer
+            default: 0
+        - in: query
+          name: limit
+          required: false
+          description: The maximum number of elements to return.
+          schema:
+            type: integer
+            default: 20
+      responses:
+        200:
+          description: Successfully loaded Customer Invitation Logs
+          content:
+            "application/json":
+              schema:
+                type: object
+                required:
+                  - items
+                  - paging
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/customerInvitationLog"
+                  paging:
+                    $ref: "#/components/schemas/paging"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /customer-invitations/{id}/open:
+    post:
+      tags:
+        - Customer Invitations
+      operationId: postCustomerInvitationOpen
+      summary: Open customer invitation
+      description: Open customer invitation
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The customer invitation id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Customer Invitation Status set to opened
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerInvitation"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /customer-invitations/{id}/withdraw:
+    description: This resource represents Customer Invitations.
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: The id of the customer invitation
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags:
+        - Customer Invitations
+      summary: Withdraw the customer invitation
+      operationId: withdrawInvitation
+      description: The customer-invitation will be set to status WITHDRAWN.
+      responses:
+        200:
+          description: The customer invitation was successfully withdrawn.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerInvitation"
+        400:
+          description: Validation failed (uuid v4 is expected)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer Invitation not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: Conflict
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customer-invitations/{id}/resend:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        description: The id of the customer-invitation
+        schema:
+          type: string
+          format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    description: This resource represents Customer Invitations.
+    post:
+      tags:
+        - Customer Invitations
+      summary: Resend customer invitation mail
+      operationId: resendCustomerInvitation
+      description: The customer-invitation email will be resent to the recipient's email address.
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              properties:
+                validityPeriod:
+                  type: string
+                  description: >
+                    The period (duration) the customer invitation should be valid.
+                    Formatted as an ISO 8601 duration.
+                  default: P30D
+                  example: P30D
+                  writeOnly: true
+      responses:
+        200:
+          description: The customer invitation was successfully resent.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerInvitation"
+        400:
+          description: Validation failed (uuid v4 is expected)
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        404:
+          description: Customer Invitation not found
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        409:
+          description: Conflict
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+        500:
+          description: unexpected error
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/problem"
+  /customers:
+    description: This resource represents a customer.
+    post:
+      tags:
+        - Customers
+      operationId: createCustomer
+      summary: Create a customer
+      description: Creates a customer based on a customer invitation and assigns the calling user to this customer
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/createCustomerRequest"
+      responses:
+        "201":
+          description: Successfully created customer.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/createCustomerResponse"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "429":
+          $ref: "#/components/responses/TooManyRequests"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    get:
+      tags:
+        - Customers
+      summary: Get Customers
+      operationId: getCustomers
+      description: Get Customers
+      responses:
+        "200":
+          description: Successfully loaded the customer the calling user is associated to
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerResponse"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /identities/validation:
+    description: This resource represents an organization validation.
+    get:
+      tags:
+        - Identities
+      operationId: getValidation
+      summary: Get a validation
+      description: Calls [Vatstack](https://vatstack.com/) in case of a VAT ID to validate, does not validate other ID types
+      parameters:
+        - in: query
+          name: country_code
+          required: true
+          description: The country the organization of which the ID shall be validated.
+          example: AT
+          schema:
+            type: string
+        - in: query
+          name: vat_id
+          required: true
+          description: The ID to be validated.
+          example: ATU1234567
+          schema:
+            type: string
+            minLength: 4
+            maxLength: 64
+      responses:
+        "200":
+          description: Successfully validated the ID.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/identityValidationResponse"
+        "202":
+          description: Successfully validated the ID.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/identityValidationResponse"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+        "503":
+          $ref: "#/components/responses/IdentificationValidationFailed"
+  /customer-setup-inquiries:
+    description: This resource represents a customer-setup-inquiry.
+    post:
+      tags:
+        - Customer Setup Inquiries
+      operationId: createCustomerSetupInquiry
+      summary: Create a customer setup inquiry
+      description: Creates a customer setup inquiry for a customer setup voucher
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              $ref: "#/components/schemas/customerSetupInquiry"
+      responses:
+        "201":
+          description: Successfully created customer setup inquiry for voucher.
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/customerSetupInquiry"
+        "400":
+          $ref: "#/components/responses/InvalidRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+
+components:
+  schemas:
+    userInvitationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the user invitation
+        customerId:
+          type: string
+          description: The id of the customer
+        organizationName:
+          type: string
+          description: The name of the organization
+        organizationCity:
+          type: string
+          description: The city of the organization
+        organizationCountryCode:
+          type: string
+          description: ISO 3166-1 country code of the country of the organization
+        status:
+          type: string
+          description: |
+            The current status of the invitation. Possible values are:
+
+            - `CREATED`
+            - `DELIVERED`
+            - `PROCESSING`
+            - `FAILED`
+            - `ACCEPTED`
+            - `WITHDRAWN`
+        isAlreadyAssociatedWithCustomer:
+          type: boolean
+          description: Indicates whether the user is already associated with the customer
+        partyRoles:
+          type: array
+          items:
+            type: string
+            example: CUSTOMER
+          description: |
+            The party roles of the customer the user has been invited to. Possible values are:
+
+            - `CUSTOMER`
+            - `CARRIER`
+            - `SHIPPER`
+          readOnly: true
+
+    acceptUserInvitationResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the user invitation
+        customerId:
+          type: string
+          description: The id of the customer
+        organizationName:
+          type: string
+          description: The name of the organization
+        organizationCity:
+          type: string
+          description: The city of the organization
+        organizationCountryCode:
+          type: string
+          description: The ISO 3166-1 country code of the country of the organization
+        status:
+          type: string
+          description: |
+            The current status of the invitation. Possible values are:
+
+            - `CREATED`
+            - `DELIVERED`
+            - `PROCESSING`
+            - `FAILED`
+            - `ACCEPTED`
+            - `WITHDRAWN`
+        partyRoles:
+          type: array
+          items:
+            type: string
+            example: CUSTOMER
+          description: |
+            The party roles of the customer the user has been invited to. Possible values are:
+
+            - `CUSTOMER`
+            - `CARRIER`
+            - `SHIPPER`
+          readOnly: true
+
+    customerSetupVoucher:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of the customer setup voucher
+          readOnly: true
+        status:
+          type: string
+          enum:
+            - CREATED
+            - IDENTITY_COLLISION
+            - VAT_VALIDATION_PENDING
+            - IDENTITY_VALIDATION_NEEDED
+            - REDEEMED
+            - MANUALLY_REDEEMED
+            - WITHDRAWN
+            - EXPIRED
+            - REJECTED
+            - COUNTRY_NOT_SUPPORTED
+            - CUSTOMER_INVITATION_EMAIL_PROCESSING
+            - CUSTOMER_INVITATION_EMAIL_DELIVERED
+            - CUSTOMER_INVITATION_EMAIL_FAILED
+          description: |
+            The current status of the voucher
+            * `CREATED` - The customer setup voucher was succesfully created
+            * `IDENTITY_COLLISION` - The recipient tried to create a new organization with a vat-id that already exists
+            * `IDENTITY_VALIDATION_NEEDED` - The recipient tried to create a new organization with a non vat-id identification number that needs to be validated manually
+            * `VAT_VALIDATION_PENDING` - The recipient tried to create a new organization with a vat-id, but VatStack could not return an immediate validation response
+            * `REDEEMED` - The recipient successfully redeemed the customer setup voucher with a new or existing customer
+            * `MANUALLY_REDEEMED` - The admin redeemed the customer setup voucher
+            * `WITHDRAWN` - The customer setup voucher was withdrawn.
+            * `EXPIRED` - The customer setup voucher is expired.
+            * `REJECTED` - The customer setup voucher was rejected.
+            * `COUNTRY_NOT_SUPPORTED` - The customer wants to register with a country that is not yet supported by Veroo.
+            * `CUSTOMER_INVITATION_EMAIL_PROCESSING` - The mail is currently being processed
+            * `CUSTOMER_INVITATION_EMAIL_DELIVERED` - The mail was successfully delivered
+            * `CUSTOMER_INVITATION_EMAIL_FAILED` - Sending the mail failed
+          example: REDEEMED
+          readOnly: true
+        type:
+          type: string
+          enum:
+            - CUSTOMER_INVITATION
+            - REFERRAL
+          description: |
+            The type of the voucher
+            * `CUSTOMER_INVITATION` - The customer setup voucher represents a customer invitation
+            * `REFERRAL` - The customer setup voucher represents a referral
+          example: CUSTOMER_INVITATION
+          readOnly: true
+        payload:
+          oneOf:
+            - $ref: '#/components/schemas/customerInvitationForVoucher'
+            - $ref: '#/components/schemas/referralForVoucher'
+        createdByAdmin:
+          type: boolean
+          readOnly: true
+          description: Specifies if a voucher was created by an admin
+
+    referralForVoucher:
+      type: object
+      required:
+        - contactPerson
+        - referredOrganization
+        - designatedPartyRoles
+        - expiresAt
+        - createdAt
+        - modifiedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of the referral
+          readOnly: true
+        externalId:
+          type: string
+          description: The external-id of the referral
+        contactPerson:
+          type: object
+          required:
+            - email
+          properties:
+            email:
+              type: string
+              format: email
+              example: test@email.com
+              maxLength: 255
+              description: The email of the user who receives this referral.
+        referredOrganization:
+          type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              example: Test Organization
+              minLength: 3
+              maxLength: 512
+              description: The name of the organization which receives this referral.
+            countryCode:
+              type: string
+              description: ISO 3166-1 country code
+              maxLength: 2
+              example: AT
+            city:
+              type: string
+              description: The name of the city
+              maxLength: 255
+              example: Graz
+            postalCode:
+              type: string
+              description: The postal code
+              maxLength: 16
+              example: 8010
+            street:
+              type: string
+              description: The name of the street
+              maxLength: 64
+              example: Abraham-A-Sancta-Clara-Gasse
+            houseNumber:
+              type: string
+              description: The house number
+              maxLength: 64
+              example: 2
+            additionalInformation:
+              type: string
+              description: Additional information to the address (Suite/Unit/etc)
+              maxLength: 255
+              example: Suite 197A
+            identification:
+              type: object
+              required:
+                - vatId
+              properties:
+                vatId:
+                  type: string
+                  description: The VAT identification value (Value Added Tax Registration Number)
+                  example: ATU1234567
+                  readOnly: true
+                  minLength: 4
+                  maxLength: 64
+        designatedPartyRoles:
+          type: array
+          items:
+            type: string
+            example: CARRIER
+            minItems: 1
+          description: |
+            The party roles, which are asssigned to the Customer this Referral lead to. Possible values are:
+
+            - `CARRIER`
+            - `SHIPPER`
+        callbackUrl:
+          type: string
+          example: https://www.veroo.io
+          maxLength: 2048
+          description: The destination url the application will redirect to after the referral was redeemed.
+        expiresAt:
+          type: string
+          format: date-time
+          description: The expiration timestamp of the referral.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the referral.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        modifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of the last time the referral got modified.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        customerCreated:
+          type: boolean
+          description: The flag if a customer has been created with the referral or not.
+          readOnly: true
+          example: false
+
+    customerInvitationForVoucher:
+      type: object
+      required:
+        - recipient
+        - designatedPartyRoles
+        - expiresAt
+        - status
+        - createdAt
+        - modifiedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of the customer invitation
+          readOnly: true
+        recipient:
+          type: object
+          required:
+            - organization
+            - contactPerson
+          properties:
+            organization:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: Test Organization
+                  minLength: 3
+                  maxLength: 512
+                  description: The proposed name of the organization which receives this invitation.
+                city:
+                  type: string
+                  example: Vienna
+                  maxLength: 255
+                  description: The proposed city of the organization which receives this invitation.
+                countryCode:
+                  type: string
+                  example: AT
+                  maxLength: 2
+                  description: ISO 3166-1 country code of the proposed country of the organization which receives this invitation.
+            contactPerson:
+              type: object
+              required:
+                - email
+                - name
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: test@email.com
+                  maxLength: 255
+                  description: The email of the user who receives this invitation.
+                name:
+                  type: string
+                  example: Mr. Test
+                  maxLength: 512
+                  description: The name of the user who receives this invitation. Will be used in the salutation of the email.
+        sender:
+          readOnly: true
+          type: object
+          properties:
+            organization:
+              required:
+                - name
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Test Organization
+                  minLength: 3
+                  maxLength: 512
+                  description: The name of the organization which sends this invitation.
+                city:
+                  type: string
+                  example: Vienna
+                  maxLength: 255
+                  description: The city of the organization which sends this invitation.
+                countryCode:
+                  type: string
+                  example: AT
+                  maxLength: 2
+                  description: ISO 3166-1 country code of the country of the organization which sends this invitation.
+            user:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  description: the first name of the user that sent the invitation
+                lastName:
+                  type: string
+                  description: the last name of the user that sent the invitation
+                email:
+                  type: string
+                  format: email
+                  example: test@email.com
+                  maxLength: 255
+                  description: The email of the user who sent this invitation.
+
+        designatedPartyRoles:
+          type: array
+          items:
+            type: string
+            example: CARRIER
+            minItems: 1
+          description: |
+            The party roles, which are asssigned to the Customer this Customer Invitation lead to. Possible values are:
+
+            - `CARRIER`
+            - `SHIPPER`
+        callbackUrl:
+          type: string
+          example: https://www.veroo.io
+          maxLength: 2048
+          description: The destination url the application will redirect to after the invitation was redeemed.
+        info:
+          type: string
+          maxLength: 512
+          description: Optional info text that will be added in the email.
+        status:
+          type: string
+          enum:
+            - CREATED
+            - SENT
+            - OPENED
+            - IDENTITY_COLLISION
+            - IDENTITY_VALIDATION_NEEDED
+            - VAT_VALIDATION_PENDING
+            - REDEEMED
+            - MANUALLY_REDEEMED
+            - WITHDRAWN
+            - EXPIRED
+            - REJECTED
+            - COUNTRY_NOT_SUPPORTED
+          description: |
+            The current status of the invitation
+            * `CREATED` - The invitation was succesfully created
+            * `SENT` - The invitation email was succesfully sent to the recipient's email address
+            * `OPENED` - The recipient has opened the invitation link, logged in with an user and has seen the first info screen of the invitation process
+            * `IDENTITY_COLLISION` - The recipient tried to create a new organization with a vat-id that already exists
+            * `IDENTITY_VALIDATION_NEEDED` - The recipient tried to create a new organization with a non vat-id identification number that needs to be validated manually
+            * `VAT_VALIDATION_PENDING` - The recipient tried to create a new organization with a vat-id, but VatStack could not return an immediate validation response
+            * `REDEEMED` - The recipient successfully redeemed the invitation with a new or existing customer
+            * `MANUALLY_REDEEMED` - An admin redeemed the invitation
+            * `WITHDRAWN` - The customer invitation was withdrawn.
+            * `EXPIRED` - The customer invitation is expired.
+            * `REJECTED` - The customer invitation was rejected.
+            * `COUNTRY_NOT_SUPPORTED` - The customer wants to register with a country that is not yet supported by Veroo.
+          example: REDEEMED
+          readOnly: true
+        expiresAt:
+          type: string
+          format: date-time
+          description: The expiration timestamp of the customer invitation.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the customer invitation.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        modifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of the last time the customer invitation got modified.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        customerCreated:
+          type: boolean
+          description: The flag if a customer has been created on Invitation or not.
+          readOnly: true
+          example: false
+
+    customerInvitation:
+      type: object
+      required:
+        - recipient
+        - designatedPartyRoles
+        - expiresAt
+        - status
+        - createdAt
+        - modifiedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of the customer invitation
+          readOnly: true
+        recipient:
+          type: object
+          required:
+            - organization
+            - contactPerson
+          properties:
+            organization:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: Test Organization
+                  minLength: 3
+                  maxLength: 512
+                  description: The proposed name of the organization which receives this invitation.
+                city:
+                  type: string
+                  example: Vienna
+                  maxLength: 255
+                  description: The proposed city of the organization which receives this invitation.
+                countryCode:
+                  type: string
+                  example: AT
+                  maxLength: 2
+                  description: ISO 3166-1 country code of the proposed country of the organization which receives this invitation.
+            contactPerson:
+              type: object
+              required:
+                - email
+                - name
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: test@email.com
+                  maxLength: 255
+                  description: The email of the user who receives this invitation.
+                name:
+                  type: string
+                  example: Mr. Test
+                  maxLength: 512
+                  description: The name of the user who receives this invitation. Will be used in the salutation of the email.
+        sender:
+          readOnly: true
+          type: object
+          properties:
+            organization:
+              required:
+                - name
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Test Organization
+                  minLength: 3
+                  maxLength: 512
+                  description: The name of the organization which sends this invitation.
+                city:
+                  type: string
+                  example: Vienna
+                  maxLength: 255
+                  description: The city of the organization which sends this invitation.
+                countryCode:
+                  type: string
+                  example: AT
+                  maxLength: 2
+                  description: ISO 3166-1 country code of the country of the organization which sends this invitation.
+            user:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                  description: the first name of the user that sent the invitation
+                lastName:
+                  type: string
+                  description: the last name of the user that sent the invitation
+                email:
+                  type: string
+                  format: email
+                  example: test@email.com
+                  maxLength: 255
+                  description: The email of the user who sent this invitation.
+
+        designatedPartyRoles:
+          type: array
+          items:
+            type: string
+            example: CARRIER
+            minItems: 1
+          description: |
+            The party roles, which are asssigned to the Customer this Customer Invitation lead to. Possible values are:
+
+            - `CARRIER`
+            - `SHIPPER`
+        callbackUrl:
+          type: string
+          example: https://www.veroo.io
+          maxLength: 2048
+          description: The destination url the application will redirect to after the invitation was redeemed.
+        info:
+          type: string
+          maxLength: 512
+          description: Optional info text that will be added in the email.
+        validityPeriod:
+          type: string
+          description: >
+            The period (duration) the customer invitation should be valid.
+            Formatted as an ISO 8601 duration.
+          default: P30D
+          example: P7D
+          writeOnly: true
+        status:
+          type: string
+          enum:
+            - CREATED
+            - OPENED
+            - VEROO_SUPPORT_CASE
+            - REDEEMED
+            - MANUALLY_REDEEMED
+            - WITHDRAWN
+            - EXPIRED
+            - REJECTED
+            - EMAIL_PROCESSING
+            - EMAIL_DELIVERED
+            - EMAIL_FAILED
+          description: |
+            The current status of the invitation
+            * `CREATED` - The invitation was succesfully created
+            * `OPENED` - The recipient has opened the invitation link, logged in with an user and has seen the first info screen of the invitation process
+            * `VEROO_SUPPORT_CASE` - The customer invitation ran into a veroo support case
+            * `REDEEMED` - The recipient successfully redeemed the invitation with a new or existing customer
+            * `MANUALLY_REDEEMED` - An admin redeemed the invitation
+            * `WITHDRAWN` - The customer invitation was withdrawn.
+            * `EXPIRED` - The customer invitation is expired.
+            * `REJECTED` - The customer invitation was rejected.
+            * `EMAIL_PROCESSING` - The mail is currently being processed
+            * `EMAIL_DELIVERED` - The mail was successfully delivered
+            * `EMAIL_FAILED` - Sending the mail failed
+          example: REDEEMED
+          readOnly: true
+        expiresAt:
+          type: string
+          format: date-time
+          description: The expiration timestamp of the customer invitation.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the customer invitation.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        modifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of the last time the customer invitation got modified.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        customerCreated:
+          type: boolean
+          description: The flag if a customer has been created on Invitation or not.
+          readOnly: true
+          example: false
+        possibleActions:
+          $ref: "#/components/schemas/customerSetupVoucherPossibleActions"
+
+    customerInvitationLog:
+      type: object
+      required:
+        - id
+        - createdAt
+        - action
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 842472e0-be98-46a2-9dfd-f81413bcdb2c
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the log entry.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+        action:
+          type: string
+          enum:
+            - CREATED
+            - OPENED
+            - REDEEMED
+            - MANUALLY_REDEEMED
+            - VEROO_SUPPORT_CASE
+            - WITHDRAWN
+            - REJECTED
+            - CUSTOMER_INVITATION_EMAIL_PROCESSING
+            - CUSTOMER_INVITATION_EMAIL_DELIVERED
+            - CUSTOMER_INVITATION_EMAIL_FAILED
+          description: |
+            The action why the log was written.
+            * `CREATED` - The invitation was succesfully created
+            * `OPENED` - The recipient has opened the invitation link, logged in with an user and has seen the first info screen of the invitation process
+            * `REDEEMED` - The recipient successfully redeemed the invitation with a new or existing customer
+            * `MANUALLY_REDEEMED` - The admin redeemed the invitation
+            * `VEROO_SUPPORT_CASE` - The invitation ran into a veroo support case.
+            * `WITHDRAWN` - The invitation was withdrawn.
+            * `REJECTED` - The invitation was rejected.
+            * `CUSTOMER_INVITATION_EMAIL_PROCESSING` - The customer invitation email is currently being processed by mailjet
+            * `CUSTOMER_INVITATION_EMAIL_DELIVERED` - The customer invitation email was delivered
+            * `CUSTOMER_INVITATION_EMAIL_FAILED` - The customer invitation email failed
+          example: REDEEMED
+          readOnly: true
+        newExpirationDate:
+          type: string
+          format: date-time
+          description: The new expiration date of the invitation, in case it has changed.
+          example: "2020-12-18T09:19:08.415Z"
+          readOnly: true
+
+    redeemCustomerSetupVoucherResponse:
+      type: object
+      required:
+        - id
+        - callbackUrl
+      properties:
+        id:
+          type: string
+          description: The id of the customer setup voucher
+          format: uuid
+          readOnly: true
+        callbackUrl:
+          type: string
+          example: https://www.veroo.io
+          maxLength: 2048
+          readOnly: true
+          description: The destination url the application will redirect to after the voucher was redeemed.
+
+    createCustomerRequest:
+      type: object
+      required:
+        - organization
+        - voucherId
+      description: >
+        A request containing organization information and an voucher id for creating a customer based on a customer setup voucher.
+      properties:
+        organization:
+          type: object
+          required:
+            - name
+            - id
+            - address
+          properties:
+            name:
+              type: string
+              maxLength: 512
+            identification:
+              $ref: "#/components/schemas/organizationIdentification"
+            address:
+              $ref: "#/components/schemas/address"
+        voucherId:
+          type: string
+          format: uuid
+
+    createCustomerResponse:
+      required:
+        - voucherId
+      allOf:
+        - type: object
+          properties:
+            voucherId:
+              type: string
+              format: uuid
+              description: The id of the voucher.
+            callbackUrl:
+              type: string
+              example: https://www.veroo.io
+              maxLength: 2048
+              description: The destination url the application will redirect to after the voucher was redeemed.
+        - $ref: "#/components/schemas/customerAttributes"
+
+    customerAttributes:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          description: The id of the customer.
+          format: uuid
+          maxLength: 64
+          readOnly: true
+          example: b76e0899-a826-4779-a61a-14b62c77e61f
+
+    address:
+      type: object
+      required:
+        - countryCode
+        - city
+      description: A postal address
+      properties:
+        countryCode:
+          type: string
+          description: ISO 3166-1 country code
+          maxLength: 2
+          example: AT
+        city:
+          type: string
+          description: The name of the city
+          maxLength: 255
+          example: Graz
+        postalCode:
+          type: string
+          description: The postal code
+          maxLength: 16
+          example: 8010
+        street:
+          type: string
+          description: The name of the street
+          maxLength: 64
+          example: Abraham-A-Sancta-Clara-Gasse
+        houseNumber:
+          type: string
+          description: The house number
+          maxLength: 64
+          example: 2
+        additionalInformation:
+          type: string
+          description: Additional information to the address (Suite/Unit/etc)
+          maxLength: 255
+          example: Suite 197A
+
+    organizationIdentification:
+      type: object
+      required:
+        - vatId
+        - type
+      description: The id used to validate an organization
+      properties:
+        vatId:
+          type: string
+          description: The VAT identification value (Value Added Tax Registration Number)
+          example: ATU1234567
+          minLength: 4
+          maxLength: 64
+        type:
+          type: string
+          enum:
+            - EU_VAT
+            - AU_GST
+            - CH_VAT
+            - GB_VAT
+            - NO_VAT
+            - AL_NIPT
+            - BY_INN
+            - BA_JIB
+            - GE_TRN
+            - MK_TIN
+            - MD_IDNO
+            - ME_RB
+            - RU_INN
+            - RS_VAT
+            - TR_MN
+            - UA_VAT
+            - ORG_INTERNAL
+          readOnly: true
+          description: The type of the ID
+          example: EU_VAT
+
+
+    identityValidationResponse:
+      type: object
+      required:
+        - identification
+      properties:
+        identification:
+          $ref: "#/components/schemas/organizationIdentification"
+        companyName:
+          type: string
+          description: The name of the company returned by vatstack, if defined
+          example: Winter Transporte GmbH
+
+    customerSetupInquiry:
+      type: object
+      required:
+        - id
+        - voucherId
+        - text
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        voucherId:
+          type: string
+          format: uuid
+          description: The id of the corresponding customer setup voucher
+        text:
+          type: string
+          description: The customer setup inquiry (contains organization and contact information)
+          example: Winter Transporte GmbH - example street 123, 8102 city - Max Mustermann (max.mustermann@email.com)
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation timestamp of the customer setup inquiry.
+          readOnly: true
+          example: "2020-12-18T09:19:08.415Z"
+
+    customerSetupVoucherPossibleActions:
+      type: array
+      items:
+        type: string
+        enum:
+          - WITHDRAW
+          - RESEND
+        description: |
+          Indicates which actions can be performed on this customer invitation
+        example: RESEND
+        readOnly: true
+
+    paging:
+      type: object
+      required:
+        - offset
+        - limit
+        - totalCount
+      properties:
+        offset:
+          type: integer
+          description: The offset used in the result.
+          example: 10
+        limit:
+          type: integer
+          description: The number of elements that are returned in one request.
+          example: 30
+        totalCount:
+          type: integer
+          description: The total number of elements in the collection.
+          example: 2873
+
+    customerResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        organization:
+          type: object
+          properties:
+            name:
+              type: string
+              maxLength: 512
+            address:
+              $ref: "#/components/schemas/address"
+
+    problem:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+          description: >
+            A absolute URI reference [RFC 3986] that identifies the problem type.
+          default: "about:blank"
+          example: "https://veroo.io/problems/constraint-violation"
+        title:
+          type: string
+          description: >
+            A short, human-readable summary of the problem type.
+          example: Service Unavailable
+        status:
+          type: integer
+          format: int32
+          description: >
+            The HTTP status code generated by the origin server for this occurrence
+            of the problem.
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+          example: 404
+        detail:
+          type: string
+          description: >
+            A human readable explanation specific to this occurrence of the
+            problem.
+          example: Connection to database timed out
+        instance:
+          type: string
+          format: uri
+          description: >
+            An absolute URI that identifies the specific occurrence of the problem.
+            It may or may not yield further information if dereferenced.
+
+  responses:
+    NotFound:
+      description: The Resource does not exist.
+      content:
+        "application/problem+json":
+          schema:
+            $ref: "#/components/schemas/problem"
+          example: >
+            {
+              "type": "https://veroo.io/problems/resource-not-found",
+              "title": "Object not found",
+              "status": 404,
+              "detail": "The Resource does not exist.",
+              "instance": "https://eta.api.veroo.io/v1/resource/ceb5576e-3c7b-4f23-a2eb-1a01b4ec5a12"
+            }
+    InvalidRequest:
+      description: The request was invalid or cannot be otherwise served.
+      content:
+        "application/problem+json":
+          schema:
+            $ref: "#/components/schemas/problem"
+          example: >
+            {
+              "type": "https://veroo.io/problems/invalid-request",
+              "title": "Invalid request",
+              "status": 400,
+              "detail": "The request was invalid or cannot be otherwise served.",
+              "instance": "https://eta.api.veroo.io/v1/resource"
+            }
+
+    Unauthorized:
+      description: Caller authorization is missing or invalid.
+      content:
+        "application/problem+json":
+          schema:
+            $ref: "#/components/schemas/problem"
+          example: >
+            {
+              "type": "https://veroo.io/problems/unauthorized",
+              "title": "Unauthorized request",
+              "status": 401,
+              "detail": "Missing or incorrect authentication credentials.",
+              "instance": "https://eta.api.veroo.io/v1/resource/ceb5576e-3c7b-4f23-a2eb-1a01b4ec5a12"
+            }
+
+    Forbidden:
+      description: >
+        The request is valid but has been refused because the caller, identified by the request
+        credentials (e.g. th Bearer token), does not have sufficient privileges.
+      content:
+        "application/problem+json":
+          schema:
+            $ref: "#/components/schemas/problem"
+          example: >
+            {
+              "type": "https://veroo.io/problems/forbidden",
+              "title": "Forbidden request",
+              "status": 403,
+              "detail": "The request is valid but has been refused because the caller, identified by the request credentials (e.g. th Bearer token), does not have sufficient privileges.",
+              "instance": "https://eta.api.veroo.io/v1/resource/ceb5576e-3c7b-4f23-a2eb-1a01b4ec5a12"
+            }
+
+    Conflict:
+      description: The request could not be completed due to a conflict with the current state of the target resource.
+      content:
+        "application/problem+json":
+          schema:
+            $ref: "#/components/schemas/problem"
+          example: >
+            {
+              "type": "https://veroo.io/problems/conflict",
+              "title": "Conflict",
+              "status": 409,
+              "detail": "The request could not be completed due to a conflict with the current state of the target resource.",
+              "instance": "https://eta.api.veroo.io/v1/resource/ceb5576e-3c7b-4f23-a2eb-1a01b4ec5a12"
+            }
+
+    TooManyRequests:
+      description: The request cannot be served because the app's rate limit has been exhausted for this resource.
+      content:
+        "application/problem+json":
+          schema:
+            $ref: "#/components/schemas/problem"
+          example: >
+            {
+              "type": "https://veroo.io/problems/too-many-requests",
+              "title": "Too Many Request",
+              "status": 429,
+              "detail": "The request cannot be served because the app's rate limit has been exhausted for this resource.",
+              "instance": "https://eta.api.veroo.io/v1/resource/ceb5576e-3c7b-4f23-a2eb-1a01b4ec5a12"
+            }
+
+    InternalServerError:
+      description: Something on the server is broken. This is usually a temporary issue.
+      content:
+        "application/problem+json":
+          schema:
+            $ref: "#/components/schemas/problem"
+          example: >
+            {
+              "type": "https://veroo.io/problems/unexpected-server-error",
+              "title": "Unexpected server error",
+              "status": 500,
+              "detail": "An unexpected error occurred.",
+              "instance": "https://eta.api.veroo.io/v1/resource/ceb5576e-3c7b-4f23-a2eb-1a01b4ec5a12"
+            }
+
+    IncorrectUserEmail:
+      description: The email of the accept request does not equal email of invitation.
+      content:
+        "application/problem+json":
+          schema:
+            $ref: "#/components/schemas/problem"
+          example: >
+            {
+              "type": "https://veroo.io/problems/incorrect-user-email",
+              "title": "email of accept request does not equal email of invitation",
+              "status": 403,
+              "detail": "Email of accept request user@example.com does not match email of invitation usertest@example.com."
+            }
+
+    IdentificationValidationFailed:
+      description: The external Validation Service is currently unavailable or returned an error we could not handle.
+      content:
+        "application/problem+json":
+          schema:
+            $ref: "#/components/schemas/problem"
+          example: >
+            {
+              "type": "https://veroo.io/problems/identity-validation-failed",
+              "title": "Identification Validation failed",
+              "status": 503,
+              "detail": "Identification Validation failed."
+            }

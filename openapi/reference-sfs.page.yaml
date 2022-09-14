@@ -1,0 +1,8 @@
+type: reference-docs
+definitionId: self-service-v1
+settings:
+  generateCodeSamples:
+    languages:
+      - lang: curl
+      - lang: JavaScript
+      - lang: Node.js
